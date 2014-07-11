@@ -1,5 +1,0 @@
-message RelayMsg
-{
-    required string connName = 1;
-    optional string msg      = 2;
-}
