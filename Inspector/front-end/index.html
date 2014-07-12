@@ -1,0 +1,575 @@
+﻿
+<!doctype html>
+<html>
+	<head>
+		<meta charset="gb2312" />
+		<title>DD CNMD</title>
+		<link href="style.css" rel="stylesheet">
+		<script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-6-10/esl.js"></script>
+	</head>
+	<body>
+
+	<div class="redBorder"></div>
+	<div class="greenBorder"></div>
+	<div class="yellowBorder"></div>
+	<div id="wrapper">
+		<nav>	
+			<dl>
+			</dl>
+		</nav>
+		
+		<div id="contentWrapper">
+			<h1 id="mainHeader">DD CNMB Network Applications Inspector</h1>
+			<h2 id="introText">掌控DD 把握一切</h2>
+			<article id="gettingStarted">
+				<h1>Performance</h1>
+
+				<h2>cpu</h2>
+				<div id="cpu_chart" style="height:400px"></div>
+
+				
+				<h2>network</h2>
+				<div id="network_chart" style="height:400px"></div>
+						
+			</article>	
+			
+<article id="lineChart">
+				<h1>Pprof</h1>
+				<h2>memstats</h2>
+				<pre><code id = "memstats" style="height:1100px"></code></pre>
+				
+				<!--<h2>profile</h2>
+				<pre><code id = "profile" style="height:800px"></code></pre> -->
+				
+				<h2>growth</h2>	
+				<pre><code id = "growth" style="height:1000px"></code></pre>
+				
+				<h2>heap</h2>
+				
+				<pre ><code id = "heap" style="height:1200px"></code></pre>
+			</article>	
+			
+<article id="barChart">
+				<h1>Proc</h1>
+				<h2>basic</h2>
+				<pre><code id = "basic" style="height:200px"></code></pre>
+				
+				<h2>threads</h2>
+				<pre><code id = "threads" ></code></pre>
+				
+				<h2>opened_files</h2>	
+				<div id="opened_files_chart" style="height:400px"></div>
+				
+				<h2>pid</h2>
+				<pre><code id = "pid"></code></pre>
+				
+				<h2>status</h2>
+				<pre><code id = "status" style="height:800px"></code></pre>
+			</article>						
+		</div>
+	</div>
+	</body>
+	<script src="jquery/jquery.min.js"></script>
+	<script src="chart/Chart.js"></script>
+	<script src="stickUp-master/stickUp.min.js"></script>
+	<script>
+	$(document).ready(function(){
+				
+					
+				// 路径配置
+				require.config({
+					paths:{
+						'echarts' : './echarts',
+						'echarts/chart/bar' : './echarts/build/echarts',
+						'echarts/chart/gauge' : './echarts/build/echarts'
+					}
+				});
+
+				// 使用
+				require(
+				[
+				'echarts',
+				'echarts/chart/bar',
+				'echarts/chart/gauge'
+				],
+				function (ec) {
+					// 基于准备好的dom，初始化echarts图表
+					var cupChart = ec.init(document.getElementById('cpu_chart'));
+					var networkChart =ec.init(document.getElementById('network_chart'));
+					var ofChart = ec.init(document.getElementById('opened_files_chart'));
+
+
+					var cpuOption = {
+						tooltip : {
+							formatter: "{a} <br/>{b} : {c}%"
+						},
+						toolbox: {
+							show : true,
+							feature : {
+								mark : {show: true},
+								restore : {show: true},
+								saveAsImage : {show: true}
+							}
+						},
+						series : [
+						{
+							name:'CPU使用率',
+							type:'gauge',
+							//center : ['50%', '50%'],    // 默认全局居中
+							radius : [0, '75%'],
+							startAngle: 140,
+							endAngle : -140,
+							min: 0,                     // 最小值
+							max: 100,                   // 最大值
+							precision: 0,               // 小数精度，默认为0，无小数点
+							splitNumber: 10,             // 分割段数，默认为5
+							axisLine: {            // 坐标轴线
+								show: true,        // 默认显示，属性show控制显示与否
+								lineStyle: {       // 属性lineStyle控制线条样式
+									color: [[0.2, 'lightgreen'],[0.4, 'orange'],[0.8, 'skyblue'],[1, '#ff4500']],
+									width: 30
+								}
+							},
+							axisTick: {            // 坐标轴小标记
+								show: true,        // 属性show控制显示与否，默认不显示
+								splitNumber: 5,    // 每份split细分多少段
+								length :8,         // 属性length控制线长
+								lineStyle: {       // 属性lineStyle控制线条样式
+									color: '#eee',
+									width: 1,
+									type: 'solid'
+								}
+							},
+							axisLabel: {           // 坐标轴文本标签，详见axis.axisLabel
+								show: true,
+								formatter: function(v){
+									switch (v+''){
+										case '10': return '弱';
+										case '30': return '低';
+										case '60': return '中';
+										case '90': return '高';
+										default: return '';
+									}
+								},
+								textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+									color: '#333'
+								}
+							},
+							splitLine: {           // 分隔线
+								show: true,        // 默认显示，属性show控制显示与否
+								length :30,         // 属性length控制线长
+								lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+									color: '#eee',
+									width: 2,
+									type: 'solid'
+								}
+							},
+							pointer : {
+								length : '80%',
+								width : 8,
+								color : 'auto'
+							},
+							title : {
+								show : true,
+								offsetCenter: ['-65%', -10],       // x, y，单位px
+								textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+									color: '#333',
+									fontSize : 15
+								}
+							},
+							detail : {
+								show : true,
+								backgroundColor: 'rgba(0,0,0,0)',
+								borderWidth: 0,
+								borderColor: '#ccc',
+								width: 100,
+								height: 40,
+								offsetCenter: ['-60%', 10],       // x, y，单位px
+								formatter:'{value}%',
+								textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+									color: 'auto',
+									fontSize : 30
+								}
+							},
+							data:[{value: 0, name: 'CPU使用率'}]
+							}
+							]
+						};
+						
+					
+					var networkOption = {
+							title : {
+								text: '网络流量'
+							},
+							tooltip : {
+								trigger: 'axis'
+							},
+							legend: {
+								data:['recv', 'send']
+							},
+							toolbox: {
+								show : true,
+								feature : {
+									mark : {show: true},
+									dataView : {show: true, readOnly: false},
+									magicType : {show: true, type: ['line', 'bar','stack', 'tiled']},
+									restore : {show: true},
+									saveAsImage : {show: true}
+								}
+							},
+							dataZoom : {
+								show : false,
+								start : 0,
+								end : 100
+							},
+							xAxis : 
+							{
+								type : 'category',
+								boundaryGap : true,
+								data : (function (){
+									var now = new Date();
+									var res = [];
+									var len = 15;
+									var interval = -28;
+									while (len-- > 1) {
+										res.push("current" +interval + "s");
+										interval +=2;
+									}
+									res.push("current")
+									return res;
+								})()
+							},
+							yAxis : 
+							{
+								type : 'value',
+								scale: true,
+								precision:1,
+								power:1,
+								name : '流量',
+								boundaryGap: [0.2, 0.2]
+							},
+							series : [
+							{
+								name:'send',
+								type:'line',
+								data:(function (){
+									var res = [];
+									var len = 15;
+									while (len--) {
+										res.push(0);
+									}
+									return res;
+								})()
+							},
+							{
+								name:'recv',
+								type:'line',
+								data:(function (){
+									var res = [];
+									var len = 15;
+									while (len--) {
+										res.push(0);
+									}
+									return res;
+								})()
+							}
+							]
+						};
+						
+					var ofOption = {
+							title : {
+								text: '打开文件数'
+							},
+							tooltip : {
+								trigger: 'axis'
+							},
+							legend: {
+								data:['filenum']
+							},
+							toolbox: {
+								show : true,
+								feature : {
+									mark : {show: true},
+									dataView : {show: true, readOnly: false},
+									magicType : {show: true, type: ['line', 'bar']},
+									restore : {show: true},
+									saveAsImage : {show: true}
+								}
+							},
+							dataZoom : {
+								show : false,
+								start : 0,
+								end : 100
+							},
+							xAxis :{
+								type : 'category',
+								boundaryGap : true,
+								data : (function (){
+									var now = new Date();
+									var res = [];
+									var len = 15;
+									var interval = -28;
+									while (len-- > 1) {
+										res.push("current"	+interval + "s");
+										interval +=2;
+									}
+									res.push("current")
+									return res;
+								})()
+							},
+							yAxis : {
+								type : 'value',
+								scale: true,
+								precision:1,
+								power:1,
+								name : '数量',
+								boundaryGap: [0.2, 0.2]
+							},
+							series :[
+							{
+								name:'filenum',
+								type:'bar',
+								data:(function (){
+									var res = [];
+									var len = 15;
+									while (len--) {
+										res.push(Math.round(Math.round(Math.random()*5)));
+									}
+									return res;
+								})()
+							}
+							]
+						};
+						
+									
+										
+						// 为echarts对象加载数据
+						cupChart.setOption(cpuOption);
+						networkChart.setOption(networkOption);
+						ofChart.setOption(ofOption);
+
+					var updateChart = function(){
+					//update cpu
+					$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"1"}
+										}).done(function(msg){
+												cpuOption.series[0].data[0].value = msg.substr(1,5);
+												cupChart.setOption(cpuOption, true);	
+												});
+												
+					//update network
+					$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"2"}
+										}).done(function(msg){
+											
+											var datas = msg.substr(1,msg.length-1).split(":");
+											// 动态数据接口 addData
+											networkChart.addData([
+														[
+															0,        // 系列索引
+															datas[0], // 新增数据
+															false,     // 新增数据是否从队列头部插入
+															false     // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+														],
+														[
+															1,        // 系列索引
+															datas[1], // 新增数据
+															false,    // 新增数据是否从队列头部插入
+															false,    // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+														]
+													]);
+											});
+											
+					//update opened files
+					$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"10"}
+										}).done(function(msg){
+											// 动态数据接口 addData
+											ofChart.addData([
+														[
+															0,        // 系列索引
+															msg.substr(2,msg.length-2), // 新增数据
+															false,     // 新增数据是否从队列头部插入
+															false     // 是否增加队列长度，false则自定删除原有数据，队头插入删队尾，队尾插入删队头
+														]
+													]);
+											});
+					}
+
+				
+				var updateInfo 	= function(){
+					updateChart();
+					//update memstats
+					$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"7"}
+										}).done(function(msg){
+												document.getElementById('memstats').innerHTML = msg.substr(1,msg.length-1);	
+												});
+				
+
+				
+				//update growth
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"4"}
+										}).done(function(msg){
+												document.getElementById("growth").innerHTML = msg.substr(1,msg.length-1);		
+												});
+					
+				//update heap
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"5"}
+										}).done(function(msg){
+												document.getElementById("heap").innerHTML = msg.substr(1,msg.length-1);		
+												});
+					
+				//update basic
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"9"}
+										}).done(function(msg){
+												document.getElementById("basic").innerHTML = msg.substr(1,msg.length-1);		
+												});
+												
+				//update threads
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"13"}
+										}).done(function(msg){
+												document.getElementById("threads").innerHTML = msg.substr(2,msg.length-2);		
+												});
+				
+				//update status
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"12"}
+										}).done(function(msg){
+												document.getElementById("status").innerHTML = msg.substr(2,msg.length-2);		
+												});
+				//update pid
+				$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"11"}
+										}).done(function(msg){
+												document.getElementById("pid").innerHTML = msg.substr(2,msg.length-2);		
+												});
+				//update profile
+				/*$.ajax({
+										type:"GET",
+										contentType: "text/plain; charset=utf-8", 
+										url:"./dd",
+										data:{type:"8"}
+										}).done(function(msg){
+												document.getElementById("profile").innerHTML = msg;		
+												});*/
+												
+				//prettyPrint();	
+												
+				};
+				updateInfo();
+
+						
+						//	clearInterval(timeTicket);
+						
+						var timeTicket = setInterval(function (){
+							
+							updateInfo();
+						},2000);
+					//	clearInterval(timeTicket);
+					
+					}
+					);
+
+		
+		var $nav = $("nav dl");
+		
+		$("article").each(function(){
+			var $el = $(this);
+			var $h1 = $el.find("h1");
+			var sectionTitle = $h1.html();
+			var articleId = $el.attr("id");
+			var $dt = $("<dt><a href=\"#"+articleId +"\">"+sectionTitle+"</a></dt>");
+			
+			$dt.find("a").on("click",function(e){
+				e.preventDefault();
+				$('html,body').animate({scrollTop: $h1.offset().top},400);
+			});
+			
+			$nav.append($dt);
+			
+			var $subtitles = $el.find("h2");
+			
+			$subtitles.each(function(){
+				var $h2 = $(this);
+				var title = $h2.text();
+				var newID = articleId + "-" +camelCase(title);
+				$h2.attr("id",newID);
+				var $dd = $("<dd><a href=\"#" +newID + "\">" + title + "</a></dd>");
+				
+				$dd.find("a").on("click",function(e){
+					e.preventDefault();
+					$('html,body').animate({scrollTop: $h2.offset().top},400);
+				})
+				$nav.append($dd);
+				
+			});
+			
+			var $articles = $el.find("article");
+			
+		});	
+		
+		$("canvas").each(function(){
+			var $canvas = $(this);
+			var ctx = this.getContext("2d");
+			
+			eval($("code[data-for='" + $canvas.attr("id") + "']").text());
+			
+			
+			var evalString = "new Chart(ctx)." + $canvas.data("type") + "(data);";
+			
+			eval(evalString);
+						
+		});
+		
+		
+		function camelCase(str){			
+			var splitString = str.split(" ");
+			
+			var returnedCamel = splitString[0].toLowerCase();
+			
+			for (var i=1; i<splitString.length; i++){
+				returnedCamel += splitString[i].charAt(0).toUpperCase() + splitString[i].substring(1).toLowerCase();
+			}
+			
+			return returnedCamel;
+			
+		}
+	});
+	</script>
+	
+</html>
