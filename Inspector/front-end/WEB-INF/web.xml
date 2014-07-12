@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app>
+    <display-name>My Web Application</display-name>
+    <description>
+        A application for test.
+    </description>
+	
+	
+	<servlet>
+		<servlet-name>dd</servlet-name>
+		<servlet-class>dd.Servlet</servlet-class>
+	</servlet>
+	
+
+		<servlet-mapping>
+		<servlet-name>dd</servlet-name>
+		<url-pattern>/dd</url-pattern>
+	</servlet-mapping>
+</web-app>
