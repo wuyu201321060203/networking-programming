@@ -57,9 +57,9 @@ void HyperProxy::onFrontConnection(TcpConnectionPtr const& conn)
     LOG_DEBUG << (conn->connected() ? "Up" : "Down");
     if(conn->connected())
     {
-        conn->setContext( ( tunnelVec_[ (roundRobinPick++) % tunnelVec_.size() ] )
-            ->getBackendConn() );
-
+        TunnelPtr pickedTunnel = tunnelVec_[(roundRobinPick++) % tunnelVec_.size()];
+        conn->setContext( pickedTunnel->getBackendConn() );
+        pickedTunnel->registerFrontConnection(conn);
         auto it = g_nameService.find(conn->name());
         if( it != g_nameService.end() )
             LOG_FATAL << "there are identical names for different Tcpconnection\n";
@@ -75,14 +75,17 @@ void HyperProxy::onFrontMessage(TcpConnectionPtr const& conn,
                                 Buffer* buf,
                                 Timestamp recvTime)
 {
-    string msg = buf->retrieveAllAsString();
-    string connName = conn->name();
-    RelayMsg const protoMsg = transformToProtoMsg(connName , msg);
-    TcpConnectionPtr const& clientConn =
-        boost::any_cast<TcpConnectionPtr const&>(conn->getContext());
-    Buffer buffer;
-    ProtobufCodec::fillEmptyBuffer(&buffer , protoMsg);
-    clientConn->send(&buffer);
+    if(!conn->getContext().empty())
+    {
+        string msg = buf->retrieveAllAsString();
+        string connName = conn->name();
+        RelayMsg const protoMsg = transformToProtoMsg(connName , msg);
+        TcpConnectionPtr const& clientConn =
+            boost::any_cast<TcpConnectionPtr const&>(conn->getContext());
+        Buffer buffer;
+        ProtobufCodec::fillEmptyBuffer(&buffer , protoMsg);
+        clientConn->send(&buffer);
+    }
 }
 
 RelayMsg HyperProxy::transformToProtoMsg(string connName , string msg)

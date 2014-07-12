@@ -2,10 +2,12 @@
 #define TUNNEL_H
 
 #include <map>
+#include <vector>
 
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <muduo/base/Logging.h>
 #include <muduo/net/EventLoop.h>
@@ -20,6 +22,7 @@
 extern std::map<muduo::string , muduo::net::TcpConnectionPtr> g_nameService;
 
 typedef boost::shared_ptr<RelayMsg> RelayMsgPtr;
+typedef boost::weak_ptr<muduo::net::TcpConnection> TcpConnectionWeakPtr;
 
 class Tunnel:public  boost::enable_shared_from_this<Tunnel>,
              private boost::noncopyable
@@ -47,7 +50,18 @@ public:
         }
         else
         {
-            LOG_FATAL << "long-time connection is breakdown";
+            client_.setConnectionCallback(muduo::net::defaultConnectionCallback);
+            client_.setMessageCallback(muduo::net::defaultMessageCallback);
+            for(auto item : frontConnVec_)
+            {
+                muduo::net::TcpConnectionPtr frontConn = item.lock();
+                if(frontConn)
+                {
+                    frontConn->setContext(boost::any());
+                    frontConn->shutdown();
+                }
+            }
+            LOG_ERROR << "long-time connection is breakdown";
         }
     }
 
@@ -62,10 +76,10 @@ public:
     {
         RelayMsgPtr relayMsg = muduo::down_pointer_cast<RelayMsg>(msg);
         std::string connName = relayMsg->connname();
-        std::string backendMsg = relayMsg->msg();
         auto it = g_nameService.find(muduo::string(connName.c_str()));
         if(it != g_nameService.end())
         {
+            std::string backendMsg = relayMsg->msg();
             g_nameService[muduo::string(connName.c_str())]->send(backendMsg);
         }
     }
@@ -75,12 +89,19 @@ public:
         return backendConn_;
     }
 
+    void registerFrontConnection(muduo::net::TcpConnectionPtr const& conn)
+    {
+        TcpConnectionWeakPtr temp(conn);
+        frontConnVec_.push_back(temp);
+    }
+
 
 private:
 
     muduo::net::TcpClient client_;
     ProtobufCodec codec_;
     muduo::net::TcpConnectionPtr backendConn_;
+    std::vector<TcpConnectionWeakPtr> frontConnVec_;
 };
 
 typedef boost::shared_ptr<Tunnel> TunnelPtr;
