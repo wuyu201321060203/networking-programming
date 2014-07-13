@@ -26,7 +26,7 @@ void memstat()
 bool parseCommandLine(int argc , char* argv[] , HyperProxy::Options& options)
 {
     options.port = 9999;
-    options.configfilePath = "./server.cc";
+    options.configfilePath = "./config.lua";
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "Help")
