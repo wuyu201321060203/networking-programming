@@ -17,9 +17,16 @@ using namespace muduo::net;
 
 std::map<string , TcpConnectionPtr> g_nameService;
 
-HyperProxy::HyperProxy(EventLoop* loop , InetAddress const& proxyAddress):
-                       server_(loop , proxyAddress , "HyperProxy"),
-                       loop_(loop)
+HyperProxy::Options::Options()
+{
+    bzero(this, sizeof(*this));
+}
+
+HyperProxy::HyperProxy(EventLoop* loop , Options const& options):
+                       loop_(loop),
+                       options_(options),
+                       server_(loop , InetAddress(options_.port),
+                               "HyperProxy")
 {
     server_.setConnectionCallback( boost::bind(&HyperProxy::onFrontConnection,
         this , _1) );
@@ -28,9 +35,9 @@ HyperProxy::HyperProxy(EventLoop* loop , InetAddress const& proxyAddress):
 
 }
 
-void HyperProxy::initBackendFromLuaiScript(std::string filePath)
+void HyperProxy::initBackendFromLuaiScript()
 {
-    parser_.doParse(filePath);
+    parser_.doParse(options_.configfilePath);
     for(int i = 0 ; i != parser_.getHostListSize() ; ++i)
     {
         TunnelPtr tunnel(new Tunnel(loop_ , parser_.getBackendServer(i)));
@@ -38,9 +45,9 @@ void HyperProxy::initBackendFromLuaiScript(std::string filePath)
     }
 }
 
-void HyperProxy::init(std::string filePath)
+void HyperProxy::init()
 {
-    initBackendFromLuaiScript(filePath);
+    initBackendFromLuaiScript();
     for(auto it = tunnelVec_.begin() ; it != tunnelVec_.end() ; ++it)
     {
         (*it)->connect();

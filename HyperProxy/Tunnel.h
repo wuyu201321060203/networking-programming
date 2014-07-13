@@ -30,16 +30,18 @@ class Tunnel:public  boost::enable_shared_from_this<Tunnel>,
 public:
 
     Tunnel(muduo::net::EventLoop* loop , muduo::net::InetAddress backendAddr):
-          client_(loop , backendAddr , "TunnelClient"),
-          codec_( boost::bind(&Tunnel::onBackendMessage , this , _1 , _2 , _3) )
+        client_(loop , backendAddr , "TunnelClient"),
+        codec_( boost::bind(&Tunnel::onBackendMessage , this , _1 , _2 , _3) )
     {
         LOG_INFO << "Tunnel";
         client_.setConnectionCallback(boost::bind(&Tunnel::onBackendConnection ,
-                                      this , _1));
+            this , _1));
         client_.setMessageCallback(boost::bind(&ProtobufCodec::onMessage,
-                                    &codec_ , _1 , _2 , _3));
+            &codec_ , _1 , _2 , _3));
 
     }
+
+private:
 
     void onBackendConnection(muduo::net::TcpConnectionPtr const& conn)
     {
@@ -65,14 +67,9 @@ public:
         }
     }
 
-    void connect()
-    {
-        client_.connect();
-    }
-
     void onBackendMessage(muduo::net::TcpConnectionPtr const& conn,
-                          MessagePtr const& msg,
-                          muduo::Timestamp recvTime)
+        MessagePtr const& msg,
+        muduo::Timestamp recvTime)
     {
         RelayMsgPtr relayMsg = muduo::down_pointer_cast<RelayMsg>(msg);
         std::string connName = relayMsg->connname();
@@ -82,6 +79,13 @@ public:
             std::string backendMsg = relayMsg->msg();
             g_nameService[muduo::string(connName.c_str())]->send(backendMsg);
         }
+    }
+
+public:
+
+    void connect()
+    {
+        client_.connect();
     }
 
     muduo::net::TcpConnectionPtr const& getBackendConn()
@@ -94,7 +98,6 @@ public:
         TcpConnectionWeakPtr temp(conn);
         frontConnVec_.push_back(temp);
     }
-
 
 private:
 

@@ -17,29 +17,36 @@ class HyperProxy:boost::noncopyable
 {
 public:
 
-    HyperProxy(muduo::net::EventLoop* loop , muduo::net::InetAddress const& proxyAddress);
+    struct Options
+    {
+        Options();
+        uint16_t port;
+        muduo::string configfilePath;
+    };
 
-    void init(std::string filePath);
+    HyperProxy(muduo::net::EventLoop* loop , Options const& options);
 
-    void onFrontConnection(muduo::net::TcpConnectionPtr const& conn);
-
-    void onFrontMessage(muduo::net::TcpConnectionPtr const& conn,
-                        muduo::net::Buffer* buf,
-                        muduo::Timestamp recvTime);
+    void init();
     void start();
 
 private:
 
     std::vector<TunnelPtr> tunnelVec_;
-    muduo::net::TcpServer server_;
     muduo::net::EventLoop* loop_;
+    Options options_;
+    muduo::net::TcpServer server_;
     ConfiguringParser parser_;
 
 private:
 
+    void onFrontConnection(muduo::net::TcpConnectionPtr const& conn);
+    void onFrontMessage(muduo::net::TcpConnectionPtr const& conn,
+                        muduo::net::Buffer* buf,
+                        muduo::Timestamp recvTime);
+
     RelayMsg transformToProtoMsg(muduo::string connName , muduo::string msg);
 
-    void initBackendFromLuaiScript(std::string filePath);
+    void initBackendFromLuaiScript();
 };
 
 #endif

@@ -9,14 +9,14 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
            -march=native -rdynamic \
            -I$(MUDUO_INCLUDE) -std=c++11
 LDFLAGS = -L$(MUDUO_LIBRARY) -lprotobuf -lmuduo_net_cpp11 -lmuduo_base_cpp11 \
-		  					 -lpthread -lrt -llua5.1
+		  					 -lpthread -lrt -llua5.1 -lboost_program_options
 
 all: HyperProxy_test
 
 clean:
 	rm -f *.o core
 
-HyperProxy_test: codec.o RelayMsg.pb.o HyperProxy.o main.o
+HyperProxy_test: codec.o RelayMsg.pb.o HyperProxy.o server.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 codec.o: $(SRC_DIR)codec.cc
@@ -28,7 +28,7 @@ RelayMsg.o: $(SRC_DIR)RelayMsg.pb.cc
 HyperProxy.o: $(SRC_DIR)HyperProxy.cc
 	g++ $(CXXFLAGS) -c $^
 
-main.o: $(SRC_DIR)main.cc
+server.o: $(SRC_DIR)server.cc
 	g++ $(CXXFLAGS) -c $^
 
 .PHONY: all clean

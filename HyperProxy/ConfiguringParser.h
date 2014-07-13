@@ -26,7 +26,7 @@ public:
 
     ConfiguringParser(){}
 
-    void doParse(std::string filePath)
+    void doParse(muduo::string filePath)
     {
         lua_State *L = lua_open();
         luaL_openlibs(L);
