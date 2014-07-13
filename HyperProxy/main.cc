@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     InetAddress listenAddr(port);
     EventLoop loop;
     HyperProxy proxy(&loop , listenAddr);
-    proxy.init();
+    proxy.init("config.lua");
     proxy.start();
     loop.runEvery(3.0 , &memstat);
     loop.loop();

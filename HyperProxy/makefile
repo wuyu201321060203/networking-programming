@@ -8,7 +8,8 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
            -Wpointer-arith -Wshadow -Wwrite-strings \
            -march=native -rdynamic \
            -I$(MUDUO_INCLUDE) -std=c++11
-LDFLAGS = -L$(MUDUO_LIBRARY) -lprotobuf -lmuduo_net_cpp11 -lmuduo_base_cpp11 -lpthread -lrt
+LDFLAGS = -L$(MUDUO_LIBRARY) -lprotobuf -lmuduo_net_cpp11 -lmuduo_base_cpp11 \
+		  					 -lpthread -lrt -llua5.1
 
 all: HyperProxy_test
 

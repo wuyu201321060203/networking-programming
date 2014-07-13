@@ -28,18 +28,19 @@ HyperProxy::HyperProxy(EventLoop* loop , InetAddress const& proxyAddress):
 
 }
 
-void HyperProxy::initBackendFromLuaiScript()
+void HyperProxy::initBackendFromLuaiScript(std::string filePath)
 {
-    char const* ip = "127.0.0.1";
-    TunnelPtr aTunnel(new Tunnel(loop_ , InetAddress(ip , 12345)));
-    TunnelPtr bTunnel(new Tunnel(loop_ , InetAddress(ip , 9877)));
-    tunnelVec_.push_back(aTunnel);
-    tunnelVec_.push_back(bTunnel);
+    parser_.doParse(filePath);
+    for(int i = 0 ; i != parser_.getHostListSize() ; ++i)
+    {
+        TunnelPtr tunnel(new Tunnel(loop_ , parser_.getBackendServer(i)));
+        tunnelVec_.push_back(tunnel);
+    }
 }
 
-void HyperProxy::init()
+void HyperProxy::init(std::string filePath)
 {
-    initBackendFromLuaiScript();
+    initBackendFromLuaiScript(filePath);
     for(auto it = tunnelVec_.begin() ; it != tunnelVec_.end() ; ++it)
     {
         (*it)->connect();
