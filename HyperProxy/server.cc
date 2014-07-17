@@ -36,12 +36,10 @@ bool parseCommandLine(int argc , char* argv[] , HyperProxy::Options& options)
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
-#ifndef NO_DEBUG
-    std::cout << options.port << "\n";
-    std::cout << options.configfilePath << "\n";
-#endif
     if(vm.count("help"))
     {
+        std::cout << "\n";
+        std::cout << desc << "\n";
         return false;
     }
     return true;
