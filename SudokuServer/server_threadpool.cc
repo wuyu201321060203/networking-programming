@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <boost/bind.hpp>
+#include <boost/program_options.hpp>
 
 #include <muduo/base/Atomic.h>
 #include <muduo/base/Logging.h>
@@ -19,6 +20,8 @@
 
 using namespace muduo;
 using namespace muduo::net;
+
+namespace po = boost::program_options;
 
 typedef muduo::Singleton<TaskFactory> SingleTaskFactory;
 typedef muduo::Singleton<TaskManager> SingleTaskManager;
@@ -135,19 +138,39 @@ class SudokuServer
   Timestamp startTime_;
 };
 
+bool parseCommandLine(int argc , char* argv[] , int* numThreads , uint16_t* port)
+{
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "Help")
+        ("port,p", po::value<uint16_t>(port), "TCP port")
+        ("num,n" , po::value<int>(numThreads), "num of computing threads");
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    if(vm.count("help"))
+    {
+        std::cout << "\n";
+        std::cout << desc << "\n";
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char* argv[])
 {
-  LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numThreads = 0;
-  if (argc > 1)
-  {
-    numThreads = atoi(argv[1]);
-  }
-  EventLoop loop;
-  InetAddress listenAddr(9981);
-  SudokuServer server(&loop, listenAddr, numThreads);
+    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    int numThreads = 0;
+    uint16_t port = 9981;
+    if(parseCommandLine(argc , argv , &numThreads , &port))
+    {
+        EventLoop loop;
+        InetAddress listenAddr(port);
+        SudokuServer server(&loop, listenAddr, numThreads);
 
-  server.start();
+        server.start();
 
-  loop.loop();
+        loop.loop();
+    }
+    return 0;
 }

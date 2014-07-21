@@ -8,7 +8,8 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
            -Wpointer-arith -Wshadow -Wwrite-strings \
            -march=native -rdynamic \
            -I$(MUDUO_INCLUDE)
-LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net -lmuduo_base -lpthread -lrt
+LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net -lmuduo_base -lpthread -lrt \
+		  				     -lboost_program_options
 
 all: sudoku_server
 
