@@ -106,7 +106,7 @@ class SudokuServer
 
     if (puzzle.size() == implicit_cast<size_t>(kCells))
     {
-      TaskPtr task = SingleTaskFactory::instance().createTask(boost::bind(&solve,
+      TaskPtr task = SingleTaskFactory::instance().returnATask(boost::bind(&solve,
                                                               conn, puzzle, id));
       SingleTaskManager::instance().runTask(task);
     }

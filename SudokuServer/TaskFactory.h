@@ -32,7 +32,7 @@ class TaskFactory:boost::noncopyable
 {
 public:
 
-    TaskPtr const createTask(TaskhandlingFunc const& handler)
+    TaskPtr const returnATask(TaskhandlingFunc const& handler)
     {
         TaskPtr task( new Task(handler) );
         return task;
