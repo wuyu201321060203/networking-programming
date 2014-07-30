@@ -2,7 +2,6 @@
 #define TASKMANAGER_H
 
 #include <muduo/base/ThreadPool.h>
-#include <muduo/base/Singleton.h>
 
 #include "TaskFactory.h"
 
@@ -22,6 +21,17 @@ public:
 
 private:
 
+    TaskManager()
+    {
+    }
+
+    ~TaskManager()
+    {
+    }
+
+private:
+
+    friend class muduo::Singleton<TaskManager>;
     muduo::ThreadPool threadPoll_;
 };
 

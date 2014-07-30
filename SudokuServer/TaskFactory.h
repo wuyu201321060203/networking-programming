@@ -6,6 +6,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
+#include <muduo/base/Singleton.h>
+
 typedef boost::function<void (void)> TaskhandlingFunc;
 
 class Task
@@ -37,6 +39,18 @@ public:
         TaskPtr task( new Task(handler) );
         return task;
     }
+
+private:
+
+    TaskFactory()
+    {
+    }
+
+    ~TaskFactory()
+    {
+    }
+
+    friend class muduo::Singleton<TaskFactory>;
 };
 
 #endif
