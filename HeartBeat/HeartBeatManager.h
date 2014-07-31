@@ -102,12 +102,12 @@ public:
     void delegateHeartBeatTask(UINT initial,  //seconds
                                UINT interval, //seconds
                                UINT heartBeats,
-                               string connName,
                                ExpiredCallback const& cb,
                                TcpConnectionPtr const& conn)
     {
         HBWorkerPtr worker( new HBWorker( loop_ , initial , interval , heartBeats,
                                           cb , conn) );
+        string connName = conn->name();
         auto it = workMap_.find(connName);
         if(it != workMap_.end())
             LOG_FATAL << "The connection heartbeat has been built";
@@ -156,5 +156,7 @@ private:
     EventLoop* loop_;
     std::map<string , HBWorkerPtr> workerMap_;
 };
+
+typedef muduo::Singleton<HeartManager> SingleHB;
 
 #endif
