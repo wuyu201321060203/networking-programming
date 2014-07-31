@@ -57,7 +57,7 @@ public:
         void onExpiredCallback()
         {
             if(T_++ > heartBeats_)
-                LOG_INFO << conn_->name() << "may be down";
+                LOG_INFO << conn_->peerAddress().toIpPort() << " may be down";
             callback_();
             timerId_ = loop_->runAfter( interval_ , boost::bind(
                 &HeartBeatManager::HBWorker::onExpiredCallback , this) );

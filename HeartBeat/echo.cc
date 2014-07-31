@@ -47,10 +47,12 @@ void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
             boost::bind(&EchoServer::onHeartBeatMessage , this),
             conn);
     }
+    /*
     else
     {
         SingleHB::instance().revokeHeartBeatTask(conn);
     }
+    */
 }
 void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
                            EchoMsgPtr const& msg,
