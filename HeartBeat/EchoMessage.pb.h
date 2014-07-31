@@ -32,19 +32,19 @@ void  protobuf_AddDesc_EchoMessage_2eproto();
 void protobuf_AssignDesc_EchoMessage_2eproto();
 void protobuf_ShutdownFile_EchoMessage_2eproto();
 
-class Echo;
-class HeartBeat;
+class EchoMessage;
+class HeartBeatMessage;
 
 // ===================================================================
 
-class Echo : public ::google::protobuf::Message {
+class EchoMessage : public ::google::protobuf::Message {
  public:
-  Echo();
-  virtual ~Echo();
+  EchoMessage();
+  virtual ~EchoMessage();
   
-  Echo(const Echo& from);
+  EchoMessage(const EchoMessage& from);
   
-  inline Echo& operator=(const Echo& from) {
+  inline EchoMessage& operator=(const EchoMessage& from) {
     CopyFrom(from);
     return *this;
   }
@@ -58,17 +58,17 @@ class Echo : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Echo& default_instance();
+  static const EchoMessage& default_instance();
   
-  void Swap(Echo* other);
+  void Swap(EchoMessage* other);
   
   // implements Message ----------------------------------------------
   
-  Echo* New() const;
+  EchoMessage* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Echo& from);
-  void MergeFrom(const Echo& from);
+  void CopyFrom(const EchoMessage& from);
+  void MergeFrom(const EchoMessage& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -102,7 +102,7 @@ class Echo : public ::google::protobuf::Message {
   inline ::std::string* mutable_msg();
   inline ::std::string* release_msg();
   
-  // @@protoc_insertion_point(class_scope:EchoServer.Echo)
+  // @@protoc_insertion_point(class_scope:EchoServer.EchoMessage)
  private:
   inline void set_has_msg();
   inline void clear_has_msg();
@@ -119,18 +119,18 @@ class Echo : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_EchoMessage_2eproto();
   
   void InitAsDefaultInstance();
-  static Echo* default_instance_;
+  static EchoMessage* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class HeartBeat : public ::google::protobuf::Message {
+class HeartBeatMessage : public ::google::protobuf::Message {
  public:
-  HeartBeat();
-  virtual ~HeartBeat();
+  HeartBeatMessage();
+  virtual ~HeartBeatMessage();
   
-  HeartBeat(const HeartBeat& from);
+  HeartBeatMessage(const HeartBeatMessage& from);
   
-  inline HeartBeat& operator=(const HeartBeat& from) {
+  inline HeartBeatMessage& operator=(const HeartBeatMessage& from) {
     CopyFrom(from);
     return *this;
   }
@@ -144,17 +144,17 @@ class HeartBeat : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const HeartBeat& default_instance();
+  static const HeartBeatMessage& default_instance();
   
-  void Swap(HeartBeat* other);
+  void Swap(HeartBeatMessage* other);
   
   // implements Message ----------------------------------------------
   
-  HeartBeat* New() const;
+  HeartBeatMessage* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const HeartBeat& from);
-  void MergeFrom(const HeartBeat& from);
+  void CopyFrom(const HeartBeatMessage& from);
+  void MergeFrom(const HeartBeatMessage& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -188,7 +188,7 @@ class HeartBeat : public ::google::protobuf::Message {
   inline ::std::string* mutable_msg();
   inline ::std::string* release_msg();
   
-  // @@protoc_insertion_point(class_scope:EchoServer.HeartBeat)
+  // @@protoc_insertion_point(class_scope:EchoServer.HeartBeatMessage)
  private:
   inline void set_has_msg();
   inline void clear_has_msg();
@@ -205,63 +205,63 @@ class HeartBeat : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_EchoMessage_2eproto();
   
   void InitAsDefaultInstance();
-  static HeartBeat* default_instance_;
+  static HeartBeatMessage* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// Echo
+// EchoMessage
 
 // optional string msg = 1;
-inline bool Echo::has_msg() const {
+inline bool EchoMessage::has_msg() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Echo::set_has_msg() {
+inline void EchoMessage::set_has_msg() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Echo::clear_has_msg() {
+inline void EchoMessage::clear_has_msg() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Echo::clear_msg() {
+inline void EchoMessage::clear_msg() {
   if (msg_ != &::google::protobuf::internal::kEmptyString) {
     msg_->clear();
   }
   clear_has_msg();
 }
-inline const ::std::string& Echo::msg() const {
+inline const ::std::string& EchoMessage::msg() const {
   return *msg_;
 }
-inline void Echo::set_msg(const ::std::string& value) {
+inline void EchoMessage::set_msg(const ::std::string& value) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(value);
 }
-inline void Echo::set_msg(const char* value) {
+inline void EchoMessage::set_msg(const char* value) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(value);
 }
-inline void Echo::set_msg(const char* value, size_t size) {
+inline void EchoMessage::set_msg(const char* value, size_t size) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* Echo::mutable_msg() {
+inline ::std::string* EchoMessage::mutable_msg() {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   return msg_;
 }
-inline ::std::string* Echo::release_msg() {
+inline ::std::string* EchoMessage::release_msg() {
   clear_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -274,56 +274,56 @@ inline ::std::string* Echo::release_msg() {
 
 // -------------------------------------------------------------------
 
-// HeartBeat
+// HeartBeatMessage
 
 // optional string msg = 1;
-inline bool HeartBeat::has_msg() const {
+inline bool HeartBeatMessage::has_msg() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void HeartBeat::set_has_msg() {
+inline void HeartBeatMessage::set_has_msg() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void HeartBeat::clear_has_msg() {
+inline void HeartBeatMessage::clear_has_msg() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void HeartBeat::clear_msg() {
+inline void HeartBeatMessage::clear_msg() {
   if (msg_ != &::google::protobuf::internal::kEmptyString) {
     msg_->clear();
   }
   clear_has_msg();
 }
-inline const ::std::string& HeartBeat::msg() const {
+inline const ::std::string& HeartBeatMessage::msg() const {
   return *msg_;
 }
-inline void HeartBeat::set_msg(const ::std::string& value) {
+inline void HeartBeatMessage::set_msg(const ::std::string& value) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(value);
 }
-inline void HeartBeat::set_msg(const char* value) {
+inline void HeartBeatMessage::set_msg(const char* value) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(value);
 }
-inline void HeartBeat::set_msg(const char* value, size_t size) {
+inline void HeartBeatMessage::set_msg(const char* value, size_t size) {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   msg_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* HeartBeat::mutable_msg() {
+inline ::std::string* HeartBeatMessage::mutable_msg() {
   set_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     msg_ = new ::std::string;
   }
   return msg_;
 }
-inline ::std::string* HeartBeat::release_msg() {
+inline ::std::string* HeartBeatMessage::release_msg() {
   clear_has_msg();
   if (msg_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;

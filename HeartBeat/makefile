@@ -8,15 +8,21 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
            -Wpointer-arith -Wshadow -Wwrite-strings \
            -march=native -rdynamic \
            -I$(MUDUO_INCLUDE)
-LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net -lmuduo_base -lpthread -lrt
+LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net -lmuduo_base -lpthread -lrt -lprotobuf
 
-all: echoServer9877
+all: echoServer
 
 clean:
 	rm -f *.o core
 
-echoServer9877: echo.o main.o
+echoServer: codec.o EchoMessage.o echo.o main.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+codec.o: $(SRC)/codec.cc
+	g++ $(CXXFLAGS) -c $^
+
+EchoMessage.o: $(SRC)/EchoMessage.pb.cc
+	g++ $(CXXFLAGS) -c $^
 
 echo.o: $(SRC)/echo.cc
 	g++ $(CXXFLAGS) -c $^

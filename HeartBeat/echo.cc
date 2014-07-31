@@ -14,10 +14,10 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
                          codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
                                             &dispatcher, _1 , _2 , _3))
 {
-    dispatcher_.registerCallback<EchoServer::Echo>(boost::bind(&EchoServer::onMessage,
-        this , _1 , _2 , _3));
+    dispatcher_.registerCallback<EchoServer::EchoMessage>(
+            boost::bind(&EchoServer::onMessage , this , _1 , _2 , _3));
 
-    dispatcher_.registerCallback<EchoServer::HeartBeat>(
+    dispatcher_.registerCallback<EchoServer::HeartBeatMessage>(
             &HeartBeatManager::MessageCallback,
             &SingleHB::instance(),
             _1 , _2 , _3);
@@ -27,6 +27,8 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
 
     server_.setMessageCallback(
         boost::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
+
+    SingleHB::instance().setEventLoop(loop_);
 }
 
 void EchoServer::start()
@@ -37,21 +39,30 @@ void EchoServer::start()
 void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
 {
     LOG_INFO << "EchoServer - " << conn->peerAddress().toIpPort() << " -> "
-        << conn->localAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
-    SingleHB::instance().setEventLoop(loop_);
-    SingleHB::instance().delegateHeartBeatTask(60 , 10 , 3,
-        boost::bind(&EchoServer::onHeartBeatMessage , this),
-        conn);
-}
+            << conn->localAddress().toIpPort() << " is "
+            << (conn->connected() ? "UP" : "DOWN");
 
+    if(conn->connected())
+    {
+        SingleHB::instance().delegateHeartBeatTask(60 , 10 , 3,
+            boost::bind(&EchoServer::onHeartBeatMessage , this),
+            conn);
+    }
+    else
+    {
+        SingleHB::instance().revokeHeartBeatTask(conn);
+    }
+}
 void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
-                           EchoPtr const& msg,
+                           EchoMsgPtr const& msg,
                            muduo::Timestamp time)
 {
-    LOG_INFO << conn->name() << " echo " << msg.size() << " bytes, "
+    LOG_INFO << conn->name() << " echo " << msg->ByteSize() << " bytes, "
         << "data received at " << time.toString();
-    codec_.send(conn , msg);
+    SingleHB::instance().resetHeartBeatTask(conn);
+    EchoMessage message;
+    message->set_msg(msg->msg());
+    codec_.send(conn , message);
 }
 
 void EchoServer::onHeartMessage()

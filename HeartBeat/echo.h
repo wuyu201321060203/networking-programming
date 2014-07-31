@@ -9,8 +9,8 @@
 #include "ProtobufDispatcher.h"
 #include "EchoMessage.pb.h"
 
-typedef boost::shared_ptr<EchoServer::Echo> EchoPtr;
-typedef boost::shared_ptr<EchoServer::HeartBeat> HBPtr;
+typedef boost::shared_ptr<EchoServer::EchoMessage> EchoMsgPtr;
+typedef boost::shared_ptr<EchoServer::HeartBeatMessage> HBMsgPtr;
 
 // RFC 862
 class EchoServer
@@ -27,7 +27,7 @@ private:
     void onConnection(muduo::net::TcpConnectionPtr const& conn);
 
     void onMessage(muduo::net::TcpConnectionPtr const& conn,
-                   EchoPtr const& msg,
+                   EchoMsgPtr const& msg,
                    muduo::Timestamp time);
 
     void onHeartBeatMessage();

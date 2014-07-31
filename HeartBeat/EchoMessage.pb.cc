@@ -17,12 +17,12 @@ namespace EchoServer {
 
 namespace {
 
-const ::google::protobuf::Descriptor* Echo_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* EchoMessage_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  Echo_reflection_ = NULL;
-const ::google::protobuf::Descriptor* HeartBeat_descriptor_ = NULL;
+  EchoMessage_reflection_ = NULL;
+const ::google::protobuf::Descriptor* HeartBeatMessage_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  HeartBeat_reflection_ = NULL;
+  HeartBeatMessage_reflection_ = NULL;
 
 }  // namespace
 
@@ -33,36 +33,36 @@ void protobuf_AssignDesc_EchoMessage_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "EchoMessage.proto");
   GOOGLE_CHECK(file != NULL);
-  Echo_descriptor_ = file->message_type(0);
-  static const int Echo_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Echo, msg_),
+  EchoMessage_descriptor_ = file->message_type(0);
+  static const int EchoMessage_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EchoMessage, msg_),
   };
-  Echo_reflection_ =
+  EchoMessage_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      Echo_descriptor_,
-      Echo::default_instance_,
-      Echo_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Echo, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Echo, _unknown_fields_),
+      EchoMessage_descriptor_,
+      EchoMessage::default_instance_,
+      EchoMessage_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EchoMessage, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EchoMessage, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(Echo));
-  HeartBeat_descriptor_ = file->message_type(1);
-  static const int HeartBeat_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeat, msg_),
+      sizeof(EchoMessage));
+  HeartBeatMessage_descriptor_ = file->message_type(1);
+  static const int HeartBeatMessage_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeatMessage, msg_),
   };
-  HeartBeat_reflection_ =
+  HeartBeatMessage_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      HeartBeat_descriptor_,
-      HeartBeat::default_instance_,
-      HeartBeat_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeat, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeat, _unknown_fields_),
+      HeartBeatMessage_descriptor_,
+      HeartBeatMessage::default_instance_,
+      HeartBeatMessage_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeatMessage, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HeartBeatMessage, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(HeartBeat));
+      sizeof(HeartBeatMessage));
 }
 
 namespace {
@@ -76,18 +76,18 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    Echo_descriptor_, &Echo::default_instance());
+    EchoMessage_descriptor_, &EchoMessage::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    HeartBeat_descriptor_, &HeartBeat::default_instance());
+    HeartBeatMessage_descriptor_, &HeartBeatMessage::default_instance());
 }
 
 }  // namespace
 
 void protobuf_ShutdownFile_EchoMessage_2eproto() {
-  delete Echo::default_instance_;
-  delete Echo_reflection_;
-  delete HeartBeat::default_instance_;
-  delete HeartBeat_reflection_;
+  delete EchoMessage::default_instance_;
+  delete EchoMessage_reflection_;
+  delete HeartBeatMessage::default_instance_;
+  delete HeartBeatMessage_reflection_;
 }
 
 void protobuf_AddDesc_EchoMessage_2eproto() {
@@ -97,14 +97,15 @@ void protobuf_AddDesc_EchoMessage_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\021EchoMessage.proto\022\nEchoServer\"\023\n\004Echo\022"
-    "\013\n\003msg\030\001 \001(\t\"\030\n\tHeartBeat\022\013\n\003msg\030\001 \001(\t", 78);
+    "\n\021EchoMessage.proto\022\nEchoServer\"\032\n\013EchoM"
+    "essage\022\013\n\003msg\030\001 \001(\t\"\037\n\020HeartBeatMessage\022"
+    "\013\n\003msg\030\001 \001(\t", 92);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "EchoMessage.proto", &protobuf_RegisterTypes);
-  Echo::default_instance_ = new Echo();
-  HeartBeat::default_instance_ = new HeartBeat();
-  Echo::default_instance_->InitAsDefaultInstance();
-  HeartBeat::default_instance_->InitAsDefaultInstance();
+  EchoMessage::default_instance_ = new EchoMessage();
+  HeartBeatMessage::default_instance_ = new HeartBeatMessage();
+  EchoMessage::default_instance_->InitAsDefaultInstance();
+  HeartBeatMessage::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_EchoMessage_2eproto);
 }
 
@@ -119,34 +120,34 @@ struct StaticDescriptorInitializer_EchoMessage_2eproto {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int Echo::kMsgFieldNumber;
+const int EchoMessage::kMsgFieldNumber;
 #endif  // !_MSC_VER
 
-Echo::Echo()
+EchoMessage::EchoMessage()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void Echo::InitAsDefaultInstance() {
+void EchoMessage::InitAsDefaultInstance() {
 }
 
-Echo::Echo(const Echo& from)
+EchoMessage::EchoMessage(const EchoMessage& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void Echo::SharedCtor() {
+void EchoMessage::SharedCtor() {
   _cached_size_ = 0;
   msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-Echo::~Echo() {
+EchoMessage::~EchoMessage() {
   SharedDtor();
 }
 
-void Echo::SharedDtor() {
+void EchoMessage::SharedDtor() {
   if (msg_ != &::google::protobuf::internal::kEmptyString) {
     delete msg_;
   }
@@ -154,27 +155,27 @@ void Echo::SharedDtor() {
   }
 }
 
-void Echo::SetCachedSize(int size) const {
+void EchoMessage::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* Echo::descriptor() {
+const ::google::protobuf::Descriptor* EchoMessage::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return Echo_descriptor_;
+  return EchoMessage_descriptor_;
 }
 
-const Echo& Echo::default_instance() {
+const EchoMessage& EchoMessage::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_EchoMessage_2eproto();  return *default_instance_;
 }
 
-Echo* Echo::default_instance_ = NULL;
+EchoMessage* EchoMessage::default_instance_ = NULL;
 
-Echo* Echo::New() const {
-  return new Echo;
+EchoMessage* EchoMessage::New() const {
+  return new EchoMessage;
 }
 
-void Echo::Clear() {
+void EchoMessage::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (has_msg()) {
       if (msg_ != &::google::protobuf::internal::kEmptyString) {
@@ -186,7 +187,7 @@ void Echo::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool Echo::MergePartialFromCodedStream(
+bool EchoMessage::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -224,7 +225,7 @@ bool Echo::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void Echo::SerializeWithCachedSizes(
+void EchoMessage::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional string msg = 1;
   if (has_msg()) {
@@ -241,7 +242,7 @@ void Echo::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* Echo::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* EchoMessage::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional string msg = 1;
   if (has_msg()) {
@@ -260,7 +261,7 @@ void Echo::SerializeWithCachedSizes(
   return target;
 }
 
-int Echo::ByteSize() const {
+int EchoMessage::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -283,10 +284,10 @@ int Echo::ByteSize() const {
   return total_size;
 }
 
-void Echo::MergeFrom(const ::google::protobuf::Message& from) {
+void EchoMessage::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const Echo* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const Echo*>(
+  const EchoMessage* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const EchoMessage*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -295,7 +296,7 @@ void Echo::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void Echo::MergeFrom(const Echo& from) {
+void EchoMessage::MergeFrom(const EchoMessage& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_msg()) {
@@ -305,24 +306,24 @@ void Echo::MergeFrom(const Echo& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void Echo::CopyFrom(const ::google::protobuf::Message& from) {
+void EchoMessage::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Echo::CopyFrom(const Echo& from) {
+void EchoMessage::CopyFrom(const EchoMessage& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Echo::IsInitialized() const {
+bool EchoMessage::IsInitialized() const {
   
   return true;
 }
 
-void Echo::Swap(Echo* other) {
+void EchoMessage::Swap(EchoMessage* other) {
   if (other != this) {
     std::swap(msg_, other->msg_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -331,11 +332,11 @@ void Echo::Swap(Echo* other) {
   }
 }
 
-::google::protobuf::Metadata Echo::GetMetadata() const {
+::google::protobuf::Metadata EchoMessage::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = Echo_descriptor_;
-  metadata.reflection = Echo_reflection_;
+  metadata.descriptor = EchoMessage_descriptor_;
+  metadata.reflection = EchoMessage_reflection_;
   return metadata;
 }
 
@@ -343,34 +344,34 @@ void Echo::Swap(Echo* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int HeartBeat::kMsgFieldNumber;
+const int HeartBeatMessage::kMsgFieldNumber;
 #endif  // !_MSC_VER
 
-HeartBeat::HeartBeat()
+HeartBeatMessage::HeartBeatMessage()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void HeartBeat::InitAsDefaultInstance() {
+void HeartBeatMessage::InitAsDefaultInstance() {
 }
 
-HeartBeat::HeartBeat(const HeartBeat& from)
+HeartBeatMessage::HeartBeatMessage(const HeartBeatMessage& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void HeartBeat::SharedCtor() {
+void HeartBeatMessage::SharedCtor() {
   _cached_size_ = 0;
   msg_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-HeartBeat::~HeartBeat() {
+HeartBeatMessage::~HeartBeatMessage() {
   SharedDtor();
 }
 
-void HeartBeat::SharedDtor() {
+void HeartBeatMessage::SharedDtor() {
   if (msg_ != &::google::protobuf::internal::kEmptyString) {
     delete msg_;
   }
@@ -378,27 +379,27 @@ void HeartBeat::SharedDtor() {
   }
 }
 
-void HeartBeat::SetCachedSize(int size) const {
+void HeartBeatMessage::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* HeartBeat::descriptor() {
+const ::google::protobuf::Descriptor* HeartBeatMessage::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return HeartBeat_descriptor_;
+  return HeartBeatMessage_descriptor_;
 }
 
-const HeartBeat& HeartBeat::default_instance() {
+const HeartBeatMessage& HeartBeatMessage::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_EchoMessage_2eproto();  return *default_instance_;
 }
 
-HeartBeat* HeartBeat::default_instance_ = NULL;
+HeartBeatMessage* HeartBeatMessage::default_instance_ = NULL;
 
-HeartBeat* HeartBeat::New() const {
-  return new HeartBeat;
+HeartBeatMessage* HeartBeatMessage::New() const {
+  return new HeartBeatMessage;
 }
 
-void HeartBeat::Clear() {
+void HeartBeatMessage::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (has_msg()) {
       if (msg_ != &::google::protobuf::internal::kEmptyString) {
@@ -410,7 +411,7 @@ void HeartBeat::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool HeartBeat::MergePartialFromCodedStream(
+bool HeartBeatMessage::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -448,7 +449,7 @@ bool HeartBeat::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void HeartBeat::SerializeWithCachedSizes(
+void HeartBeatMessage::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional string msg = 1;
   if (has_msg()) {
@@ -465,7 +466,7 @@ void HeartBeat::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* HeartBeat::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* HeartBeatMessage::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional string msg = 1;
   if (has_msg()) {
@@ -484,7 +485,7 @@ void HeartBeat::SerializeWithCachedSizes(
   return target;
 }
 
-int HeartBeat::ByteSize() const {
+int HeartBeatMessage::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -507,10 +508,10 @@ int HeartBeat::ByteSize() const {
   return total_size;
 }
 
-void HeartBeat::MergeFrom(const ::google::protobuf::Message& from) {
+void HeartBeatMessage::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const HeartBeat* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const HeartBeat*>(
+  const HeartBeatMessage* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const HeartBeatMessage*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -519,7 +520,7 @@ void HeartBeat::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void HeartBeat::MergeFrom(const HeartBeat& from) {
+void HeartBeatMessage::MergeFrom(const HeartBeatMessage& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_msg()) {
@@ -529,24 +530,24 @@ void HeartBeat::MergeFrom(const HeartBeat& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void HeartBeat::CopyFrom(const ::google::protobuf::Message& from) {
+void HeartBeatMessage::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void HeartBeat::CopyFrom(const HeartBeat& from) {
+void HeartBeatMessage::CopyFrom(const HeartBeatMessage& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool HeartBeat::IsInitialized() const {
+bool HeartBeatMessage::IsInitialized() const {
   
   return true;
 }
 
-void HeartBeat::Swap(HeartBeat* other) {
+void HeartBeatMessage::Swap(HeartBeatMessage* other) {
   if (other != this) {
     std::swap(msg_, other->msg_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
@@ -555,11 +556,11 @@ void HeartBeat::Swap(HeartBeat* other) {
   }
 }
 
-::google::protobuf::Metadata HeartBeat::GetMetadata() const {
+::google::protobuf::Metadata HeartBeatMessage::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = HeartBeat_descriptor_;
-  metadata.reflection = HeartBeat_reflection_;
+  metadata.descriptor = HeartBeatMessage_descriptor_;
+  metadata.reflection = HeartBeatMessage_reflection_;
   return metadata;
 }
 

@@ -1,11 +1,11 @@
 package EchoServer;
 
-message Echo
+message EchoMessage
 {
     optional string msg = 1;
 }
 
-message HeartBeat
+message HeartBeatMessage
 {
     optional string msg = 1;
 }

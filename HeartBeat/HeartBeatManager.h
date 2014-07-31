@@ -8,9 +8,11 @@
 #include <boost/function.hpp>
 
 #include <muduo/base/Timestamp.h>
-#include <muduo/base/TimerId.h>
+#include <muduo/net/TimerId.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/base/Singleton.h>
+
+#include "EchoMessage.pb.h"
 
 typedef boost::function<void ()> ExpiredCallback;
 typedef unsigned int UINT;
@@ -114,15 +116,17 @@ public:
         workMap_[connName] = worker;
     }
 
-    void resetHeartBeatTask(string connName)
+    void resetHeartBeatTask(TcpConnectionPtr const& conn)
     {
+        string connName = conn->name();
         HBWorkerPtr worker = workerMap_[connName];
         worker->resetExpiredTime();
         worker->resetHeartBeats();
     }
 
-    void revokeHeartBeatTask(string connName)
+    void revokeHeartBeatTask(TcpConnectionPtr const& conn)
     {
+        string connName = conn->name();
         auto it = workerMap_.find(connName);
         if( it != workerMap_.end() )
             (it->second)->cancelTimer();
@@ -130,7 +134,7 @@ public:
     }
 
     void MessageCallBack(muduo::net::TcpConnectionPtr const& conn,
-                         HeartBeatMessage const& msg,
+                         EchoServer::HeartBeatMessage const& msg,
                          muduo::Timestamp timestamp)
     {
         resetHeartBeatTask( conn->name() );
