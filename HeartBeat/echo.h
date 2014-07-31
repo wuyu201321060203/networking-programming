@@ -7,6 +7,7 @@
 
 #include "codec.h"
 #include "ProtobufDispatcher.h"
+#include "EchoMessage.pb.h"
 
 typedef boost::shared_ptr<EchoServer::Echo> EchoPtr;
 typedef boost::shared_ptr<EchoServer::HeartBeat> HBPtr;
@@ -14,26 +15,30 @@ typedef boost::shared_ptr<EchoServer::HeartBeat> HBPtr;
 // RFC 862
 class EchoServer
 {
- public:
-  EchoServer(muduo::net::EventLoop* loop,
-             muduo::net::InetAddress const& listenAddr);
+public:
 
-  void start();
+    EchoServer(muduo::net::EventLoop* loop,
+               muduo::net::InetAddress const& listenAddr);
 
- private:
-  void onConnection(muduo::net::TcpConnectionPtr const& conn);
+    void start();
 
-  void onMessage(muduo::net::TcpConnectionPtr const& conn,
-                 EchoPtr const& msg,
-                 muduo::Timestamp time);
+private:
 
-  void onUnknwonMessage(TcpConnectionPtr const& conn , MessagePtr const& meg,
-                        Timestamp receiveTime);
+    void onConnection(muduo::net::TcpConnectionPtr const& conn);
 
-  EventLoop* loop_;
-  muduo::net::TcpServer server_;
-  ProtobufCodec codec_;
-  ProtobufDispatcher dispatcher_;
+    void onMessage(muduo::net::TcpConnectionPtr const& conn,
+                   EchoPtr const& msg,
+                   muduo::Timestamp time);
+
+    void onHeartBeatMessage();
+
+    void onUnknwonMessage(TcpConnectionPtr const& conn , MessagePtr const& meg,
+                          Timestamp receiveTime);
+
+    EventLoop* loop_;
+    muduo::net::TcpServer server_;
+    ProtobufCodec codec_;
+    ProtobufDispatcher dispatcher_;
 };
 
 #endif

@@ -7,11 +7,11 @@
 
 EchoServer::EchoServer(muduo::net::EventLoop* loop,
                        muduo::net::InetAddress const& listenAddr)
-                      : loop_(loop),
-                        server_(loop, listenAddr, "EchoServer"),
-                        dispatcher_(boost::bind(&EchoServer::onUnknownMessage,
+                       : loop_(loop),
+                         server_(loop, listenAddr, "EchoServer"),
+                         dispatcher_(boost::bind(&EchoServer::onUnknownMessage,
                                                 this , _1 , _2 , _3)),
-                        codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
+                         codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
                                             &dispatcher, _1 , _2 , _3))
 {
     dispatcher_.registerCallback<EchoServer::Echo>(boost::bind(&EchoServer::onMessage,
@@ -40,7 +40,7 @@ void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
         << conn->localAddress().toIpPort() << " is "
         << (conn->connected() ? "UP" : "DOWN");
     SingleHB::instance().setEventLoop(loop_);
-    SingleHB::instance().delegateHeartBeatTask(60 , 10 , 3 , conn->name(),
+    SingleHB::instance().delegateHeartBeatTask(60 , 10 , 3,
         boost::bind(&EchoServer::onHeartBeatMessage , this),
         conn);
 }
@@ -54,10 +54,14 @@ void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
     codec_.send(conn , msg);
 }
 
+void EchoServer::onHeartMessage()
+{
+    return;
+}
+
 void EchoServer::onUnknownMessage(TcpConnectionPtr const& conn,
                                   MessagePtr const& msg,
                                   Timestamp receiveTime)
 {
     LOG_INFO << "onUnknownMessage:" << msg->GetTypeName();
 }
-
