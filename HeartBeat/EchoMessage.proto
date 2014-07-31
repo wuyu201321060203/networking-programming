@@ -1,0 +1,11 @@
+package EchoServer;
+
+message Echo
+{
+    optional string msg = 1;
+}
+
+message HeartBeat
+{
+    optional string msg = 1;
+}
