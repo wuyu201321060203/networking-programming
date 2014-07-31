@@ -13,8 +13,6 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 
-namespace EchoServer {
-
 namespace {
 
 const ::google::protobuf::Descriptor* EchoMessage_descriptor_ = NULL;
@@ -97,9 +95,8 @@ void protobuf_AddDesc_EchoMessage_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\021EchoMessage.proto\022\nEchoServer\"\032\n\013EchoM"
-    "essage\022\013\n\003msg\030\001 \001(\t\"\037\n\020HeartBeatMessage\022"
-    "\013\n\003msg\030\001 \001(\t", 92);
+    "\n\021EchoMessage.proto\"\032\n\013EchoMessage\022\013\n\003ms"
+    "g\030\001 \001(\t\"\037\n\020HeartBeatMessage\022\013\n\003msg\030\001 \001(\t", 80);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "EchoMessage.proto", &protobuf_RegisterTypes);
   EchoMessage::default_instance_ = new EchoMessage();
@@ -566,7 +563,5 @@ void HeartBeatMessage::Swap(HeartBeatMessage* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
-
-}  // namespace EchoServer
 
 // @@protoc_insertion_point(global_scope)

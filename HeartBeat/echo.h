@@ -9,8 +9,8 @@
 #include "ProtobufDispatcher.h"
 #include "EchoMessage.pb.h"
 
-typedef boost::shared_ptr<EchoServer::EchoMessage> EchoMsgPtr;
-typedef boost::shared_ptr<EchoServer::HeartBeatMessage> HBMsgPtr;
+typedef boost::shared_ptr<EchoMessage> EchoMsgPtr;
+typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
 
 // RFC 862
 class EchoServer

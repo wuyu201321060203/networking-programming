@@ -25,8 +25,6 @@
 #include <google/protobuf/generated_message_reflection.h>
 // @@protoc_insertion_point(includes)
 
-namespace EchoServer {
-
 // Internal implementation detail -- do not call these.
 void  protobuf_AddDesc_EchoMessage_2eproto();
 void protobuf_AssignDesc_EchoMessage_2eproto();
@@ -102,7 +100,7 @@ class EchoMessage : public ::google::protobuf::Message {
   inline ::std::string* mutable_msg();
   inline ::std::string* release_msg();
   
-  // @@protoc_insertion_point(class_scope:EchoServer.EchoMessage)
+  // @@protoc_insertion_point(class_scope:EchoMessage)
  private:
   inline void set_has_msg();
   inline void clear_has_msg();
@@ -188,7 +186,7 @@ class HeartBeatMessage : public ::google::protobuf::Message {
   inline ::std::string* mutable_msg();
   inline ::std::string* release_msg();
   
-  // @@protoc_insertion_point(class_scope:EchoServer.HeartBeatMessage)
+  // @@protoc_insertion_point(class_scope:HeartBeatMessage)
  private:
   inline void set_has_msg();
   inline void clear_has_msg();
@@ -336,8 +334,6 @@ inline ::std::string* HeartBeatMessage::release_msg() {
 
 
 // @@protoc_insertion_point(namespace_scope)
-
-}  // namespace EchoServer
 
 #ifndef SWIG
 namespace google {

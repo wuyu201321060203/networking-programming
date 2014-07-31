@@ -14,10 +14,10 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
                          codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
                                             &dispatcher, _1 , _2 , _3))
 {
-    dispatcher_.registerCallback<EchoServer::EchoMessage>(
+    dispatcher_.registerCallback<EchoMessage>(
             boost::bind(&EchoServer::onMessage , this , _1 , _2 , _3));
 
-    dispatcher_.registerCallback<EchoServer::HeartBeatMessage>(
+    dispatcher_.registerCallback<HeartBeatMessage>(
             &HeartBeatManager::MessageCallback,
             &SingleHB::instance(),
             _1 , _2 , _3);
