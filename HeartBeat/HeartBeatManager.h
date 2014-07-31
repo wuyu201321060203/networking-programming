@@ -17,8 +17,8 @@
 typedef boost::function<void ()> ExpiredCallback;
 typedef unsigned int UINT;
 
-using muduo;
-using muduo::net;
+using namespace muduo;
+using namespace muduo::net;
 
 class HeartBeatManager : boost::noncopyable
 {
@@ -33,7 +33,7 @@ public:
                   UINT initial,
                   UINT interval,
                   UINT heartBeats,
-                  ExpiredCallback cb,
+                  ExpiredCallback const& cb,
                   TcpConnectionPtr const& conn
                 ):loop_(loop),
                   initial_(initial),
@@ -44,8 +44,8 @@ public:
                   cancelled_(false),
                   conn_(conn)
         {
-            timerId_ = loop->runAfter( initial_ , boost::bind(&ExpiredCallback,
-                                       this) );
+            timerId_ = loop->runAfter( initial_ , boost::bind(
+                    &HeartBeatManager::HBWorker::onExpiredCallback , this) );
         }
 
         ~HBWorker()//取消定时器
@@ -54,20 +54,20 @@ public:
                 cancelTimer();
         }
 
-        void ExpiredCallback()
+        void onExpiredCallback()
         {
-            if(T_++ > heartBeats)
-                LOG_INFO << conn->name() << "may be down";
+            if(T_++ > heartBeats_)
+                LOG_INFO << conn_->name() << "may be down";
             callback_();
-            timerId_ = loop->runAfter( interval , boost::bind(&ExpiredCallback,
-                                       this) );
+            timerId_ = loop_->runAfter( interval_ , boost::bind(
+                &HeartBeatManager::HBWorker::onExpiredCallback , this) );
         }
 
         void resetExpiredTime()
         {
             cancelTimer();
-            timerId_ = loop->runAfter( initial_ , boost::bind(&ExpiredCallback,
-                                       this ) );
+            timerId_ = loop_->runAfter( initial_ , boost::bind(
+                &HeartBeatManager::HBWorker::onExpiredCallback , this ) );
         }
 
         void resetHeartBeats()
@@ -77,7 +77,7 @@ public:
 
         void cancelTimer()
         {
-            loop->cancel(timerId_);
+            loop_->cancel(timerId_);
         }
 
     private:
@@ -96,7 +96,7 @@ public:
     typedef boost::shared_ptr<HBWorker> HBWorkerPtr;
     //end HBWorker
 
-    void setEventLoop(EventLoop loop*)
+    void setEventLoop(EventLoop* loop)
     {
         loop_ = loop;
     }
@@ -110,10 +110,10 @@ public:
         HBWorkerPtr worker( new HBWorker( loop_ , initial , interval , heartBeats,
                                           cb , conn) );
         string connName = conn->name();
-        auto it = workMap_.find(connName);
-        if(it != workMap_.end())
+        auto it = workerMap_.find(connName);
+        if(it != workerMap_.end())
             LOG_FATAL << "The connection heartbeat has been built";
-        workMap_[connName] = worker;
+        workerMap_[connName] = worker;
     }
 
     void resetHeartBeatTask(TcpConnectionPtr const& conn)
@@ -133,14 +133,16 @@ public:
         workerMap_.erase(it);
     }
 
-    void MessageCallBack(muduo::net::TcpConnectionPtr const& conn,
-                         EchoServer::HeartBeatMessage const& msg,
-                         muduo::Timestamp timestamp)
+    void onMessageCallback(muduo::net::TcpConnectionPtr const& conn,
+                           HBMsgPtr const& msg,
+                           muduo::Timestamp timestamp)
     {
-        resetHeartBeatTask( conn->name() );
+        resetHeartBeatTask(conn);
         muduo::net::Buffer buf;
-        Protobuf::fileEmptyBuf(&buf , msg);
-        conn->send(buf);
+        EchoMessage message;
+        message.set_msg(msg->msg());
+        ProtobufCodec::fillEmptyBuffer(&buf , message);
+        conn->send(&buf);
     }
 
 private:
@@ -161,6 +163,6 @@ private:
     std::map<string , HBWorkerPtr> workerMap_;
 };
 
-typedef muduo::Singleton<HeartManager> SingleHB;
+typedef muduo::Singleton<HeartBeatManager> SingleHB;
 
 #endif

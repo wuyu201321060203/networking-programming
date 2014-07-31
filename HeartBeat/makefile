@@ -6,22 +6,22 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
 	       -Wconversion -Wno-unused-parameter \
            -Wold-style-cast -Woverloaded-virtual \
            -Wpointer-arith -Wshadow -Wwrite-strings \
-           -march=native -rdynamic \
+           -march=native -rdynamic -std=c++11 \
            -I$(MUDUO_INCLUDE)
-LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net -lmuduo_base -lpthread -lrt -lprotobuf
+LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net_cpp11 -lmuduo_base_cpp11 -lpthread -lrt -lprotobuf
 
 all: echoServer
 
 clean:
 	rm -f *.o core
 
-echoServer: codec.o EchoMessage.o echo.o main.o
+echoServer: codec.o EchoMessage.pb.o echo.o main.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 codec.o: $(SRC)/codec.cc
 	g++ $(CXXFLAGS) -c $^
 
-EchoMessage.o: $(SRC)/EchoMessage.pb.cc
+EchoMessage.pb..o: $(SRC)/EchoMessage.pb.cc
 	g++ $(CXXFLAGS) -c $^
 
 echo.o: $(SRC)/echo.cc

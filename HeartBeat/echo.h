@@ -32,13 +32,14 @@ private:
 
     void onHeartBeatMessage();
 
-    void onUnknwonMessage(TcpConnectionPtr const& conn , MessagePtr const& meg,
-                          Timestamp receiveTime);
+    void onUnknownMessage(muduo::net::TcpConnectionPtr const& conn,
+                          MessagePtr const& meg,
+                          muduo::Timestamp receiveTime);
 
-    EventLoop* loop_;
+    muduo::net::EventLoop* loop_;
     muduo::net::TcpServer server_;
-    ProtobufCodec codec_;
     ProtobufDispatcher dispatcher_;
+    ProtobufCodec codec_;
 };
 
 #endif

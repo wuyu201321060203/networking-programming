@@ -12,15 +12,14 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
                          dispatcher_(boost::bind(&EchoServer::onUnknownMessage,
                                                 this , _1 , _2 , _3)),
                          codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
-                                            &dispatcher, _1 , _2 , _3))
+                                            &dispatcher_, _1 , _2 , _3))
 {
     dispatcher_.registerCallback<EchoMessage>(
             boost::bind(&EchoServer::onMessage , this , _1 , _2 , _3));
 
     dispatcher_.registerCallback<HeartBeatMessage>(
-            &HeartBeatManager::MessageCallback,
-            &SingleHB::instance(),
-            _1 , _2 , _3);
+            boost::bind(&HeartBeatManager::onMessageCallback,
+            &SingleHB::instance() , _1 , _2 , _3));
 
     server_.setConnectionCallback(
         boost::bind(&EchoServer::onConnection, this, _1));
@@ -61,11 +60,11 @@ void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
         << "data received at " << time.toString();
     SingleHB::instance().resetHeartBeatTask(conn);
     EchoMessage message;
-    message->set_msg(msg->msg());
+    message.set_msg(msg->msg());
     codec_.send(conn , message);
 }
 
-void EchoServer::onHeartMessage()
+void EchoServer::onHeartBeatMessage()
 {
     return;
 }
