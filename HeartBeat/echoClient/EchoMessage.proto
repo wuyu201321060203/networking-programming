@@ -1,0 +1,9 @@
+message EchoMessage
+{
+    optional string msg = 1;
+}
+
+message HeartBeatMessage
+{
+    optional string msg = 1;
+}

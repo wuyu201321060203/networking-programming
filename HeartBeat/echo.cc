@@ -1,6 +1,6 @@
-#include <muduo/base/Logging.h>
-
 #include <boost/bind.hpp>
+
+#include <muduo/base/Logging.h>
 
 #include "echo.h"
 #include "HeartBeatManager.h"
@@ -47,13 +47,14 @@ void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
             boost::bind(&EchoServer::onHeartBeatMessage , this),
             conn);
     }
-    /*
+    /* For debug
     else
     {
         SingleHB::instance().revokeHeartBeatTask(conn);
     }
     */
 }
+
 void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
                            EchoMsgPtr const& msg,
                            muduo::Timestamp time)

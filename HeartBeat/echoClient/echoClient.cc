@@ -1,20 +1,25 @@
-#include <muduo/net/TcpClient.h>
+#include <utility>
+#include <stdio.h>
+#include <unistd.h>
 
+#include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+
+#include <muduo/net/TcpClient.h>
 #include <muduo/base/Logging.h>
 #include <muduo/base/Thread.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/InetAddress.h>
 
-#include <boost/bind.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-
-#include <utility>
-
-#include <stdio.h>
-#include <unistd.h>
+#include "codec.h"
+#include "ProtobufDispatcher.h"
+#include "EchoMessage.pb.h"
+#include "HeartBeatManager.h"
 
 using namespace muduo;
 using namespace muduo::net;
+
+typedef boost::shared_ptr<EchoMessage> EchoMsgPtr;
 
 int numThreads = 0;
 class EchoClient;
@@ -27,12 +32,26 @@ public:
 
     EchoClient(EventLoop* loop, InetAddress const& listenAddr, string const& id)
         : loop_(loop),
-        client_(loop, listenAddr, "EchoClient"+id)
+          client_(loop, listenAddr, "EchoClient"+id),
+          dispatcher_(boost::bind(&EchoClient::onUnknownMessage,
+                                  this , _1 , _2 , _3)),
+          codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
+                             &dispatcher_, _1 , _2 , _3))
+
     {
+        dispatcher_.registerCallback<EchoMessage>(
+            boost::bind(&EchoClient::onMessage , this , _1 , _2 , _3));
+        dispatcher_.registerCallback<HeartBeatMessage>(
+            boost::bind(&HeartBeatManager::onMessageCallback,
+            &SingleHB::instance() , _1 , _2 , _3));
+
         client_.setConnectionCallback(
             boost::bind(&EchoClient::onConnection, this, _1));
+
         client_.setMessageCallback(
-            boost::bind(&EchoClient::onMessage, this, _1, _2, _3));
+            boost::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
+
+        SingleHB::instance().setEventLoop(loop_);
     }
 
     void connect()
@@ -50,6 +69,10 @@ private:
 
         if (conn->connected())
         {
+            SingleHB::instance().delegateHeartBeatTask(50 , 10 , 3,
+                boost::bind(&EchoClient::onHeartBeatMessage , this , conn),
+                conn);
+
             ++current;
             if (implicit_cast<size_t>(current) < clients.size())
             {
@@ -57,30 +80,38 @@ private:
             }
             LOG_INFO << "*** connected " << current;
         }
-        conn->send("world\n");
+        EchoMessage message;
+        message.set_msg("helloworld");
+        codec_.send(conn , message);
     }
 
-    void onMessage(TcpConnectionPtr const& conn, Buffer* buf, Timestamp time)
+    void onMessage(TcpConnectionPtr const& conn, EchoMsgPtr const& msg, Timestamp time)
     {
-        string msg(buf->retrieveAllAsString());
-        LOG_TRACE << conn->name() << " recv " << msg.size() << " bytes at " << time.toString();
-        if (msg == "quit\n")
-        {
-            conn->send("bye\n");
-            conn->shutdown();
-        }
-        else if (msg == "shutdown\n")
-        {
-            loop_->quit();
-        }
-        else
-        {
-            conn->send(msg);
-        }
+        SingleHB::instance().resetHeartBeatTask(conn);
+        LOG_TRACE << conn->name() << " recv " << msg->ByteSize() << " bytes at " << time.toString();
+        EchoMessage message;
+        message.set_msg(msg->msg());
+        codec_.send(conn , message);
+    }
+
+    void onHeartBeatMessage(TcpConnectionPtr const& conn)
+    {
+        HeartBeatMessage message;
+        message.set_msg("bingo");
+        codec_.send(conn , message);
+    }
+
+    void onUnknownMessage(TcpConnectionPtr const& conn,
+                          MessagePtr const& msg,
+                          Timestamp receiveTime)
+    {
+         LOG_INFO << "onUnknownMessage:" << msg->GetTypeName();
     }
 
     EventLoop* loop_;
     TcpClient client_;
+    ProtobufDispatcher dispatcher_;
+    ProtobufCodec codec_;
 };
 
 int main(int argc, char* argv[])

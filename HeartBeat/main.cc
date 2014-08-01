@@ -15,4 +15,3 @@ int main()
   server.start();
   loop.loop();
 }
-

@@ -1,9 +1,9 @@
 #ifndef ECHOSERVER_H
 #define ECHOSERVER_H
 
-#include <muduo/net/TcpServer.h>
-
 #include <boost/shared_ptr.hpp>
+
+#include <muduo/net/TcpServer.h>
 
 #include "codec.h"
 #include "ProtobufDispatcher.h"
