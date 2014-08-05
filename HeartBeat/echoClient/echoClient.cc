@@ -4,6 +4,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/program_options.hpp>
 
 #include <muduo/net/TcpClient.h>
 #include <muduo/base/Logging.h>
@@ -18,6 +19,8 @@
 
 using namespace muduo;
 using namespace muduo::net;
+
+namespace po = boost::program_options;
 
 typedef boost::shared_ptr<EchoMessage> EchoMsgPtr;
 
@@ -114,25 +117,38 @@ private:
     ProtobufCodec codec_;
 };
 
+
+bool parseCommandLine(int argc , char* argv[] , int* clientNum , string* ip,
+                      uint16_t* port)
+{
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help,h", "Help")
+        ("port,p", po::value<uint16_t>(port), "TCP port")
+        ("ip,i" , po::value<string>(ip), "ip of server")
+        ("clients,n" , po::value<int>(clientNum), "num of clients");
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    if(vm.count("help"))
+    {
+        std::cout << "\n";
+        std::cout << desc << "\n";
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char* argv[])
 {
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-    if (argc > 2)
+    int n = 1;
+    string ip = "127.0.0.1";
+    uint16_t port = 9877;
+    if(parseCommandLine(argc , argv , &n , &ip , &port))
     {
         EventLoop loop;
-
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-        uint16_t port;
-        port = static_cast<uint16_t>( atoi(argv[2]) );
-        InetAddress serverAddr(argv[1], port);
-#pragma GCC diagnostic error "-Wold-style-cast"
-
-        int n = 1;
-        if (argc > 3)
-        {
-            n = atoi(argv[3]);
-        }
-
+        InetAddress serverAddr(ip , port);
         clients.reserve(n);
         for (int i = 0; i < n; ++i)
         {
@@ -144,8 +160,5 @@ int main(int argc, char* argv[])
         clients[current].connect();
         loop.loop();
     }
-    else
-    {
-        printf("Usage: %s host_ip [current#]\n", argv[0]);
-    }
+    return 0;
 }
