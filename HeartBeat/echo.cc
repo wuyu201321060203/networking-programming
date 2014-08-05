@@ -15,7 +15,7 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
                                             &dispatcher_, _1 , _2 , _3))
 {
     dispatcher_.registerCallback<EchoMessage>(
-            boost::bind(&EchoServer::onMessage , this , _1 , _2 , _3));
+            boost::bind(&EchoServer::onEchoMessage , this , _1 , _2 , _3));
 
     dispatcher_.registerCallback<HeartBeatMessage>(
             boost::bind(&HeartBeatManager::onMessageCallback,
@@ -55,7 +55,7 @@ void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
     */
 }
 
-void EchoServer::onMessage(muduo::net::TcpConnectionPtr const& conn,
+void EchoServer::onEchoMessage(muduo::net::TcpConnectionPtr const& conn,
                            EchoMsgPtr const& msg,
                            muduo::Timestamp time)
 {

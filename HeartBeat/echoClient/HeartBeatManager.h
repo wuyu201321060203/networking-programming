@@ -14,7 +14,7 @@
 
 #include "EchoMessage.pb.h"
 
-typedef boost::function<void ()> ExpiredCallback;
+typedef boost::function<void ()> TimeoutCallback;
 typedef unsigned int UINT;
 typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
 
@@ -34,7 +34,7 @@ public:
                   UINT initial,
                   UINT interval,
                   UINT heartBeats,
-                  ExpiredCallback const& cb,
+                  TimeoutCallback const& cb,
                   TcpConnectionPtr const& conn
                 ):loop_(loop),
                   initial_(initial),
@@ -88,7 +88,7 @@ public:
         UINT interval_;
         UINT heartBeats_;
         UINT T_;
-        ExpiredCallback callback_;
+        TimeoutCallback callback_;
         bool cancelled_;
         TcpConnectionPtr conn_;
         TimerId timerId_;
@@ -105,7 +105,7 @@ public:
     void delegateHeartBeatTask(UINT initial,  //seconds
                                UINT interval, //seconds
                                UINT heartBeats,
-                               ExpiredCallback const& cb,
+                               TimeoutCallback const& cb,
                                TcpConnectionPtr const& conn)
     {
         HBWorkerPtr worker( new HBWorker( loop_ , initial , interval , heartBeats,

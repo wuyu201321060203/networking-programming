@@ -26,7 +26,7 @@ private:
 
     void onConnection(muduo::net::TcpConnectionPtr const& conn);
 
-    void onMessage(muduo::net::TcpConnectionPtr const& conn,
+    void onEchoMessage(muduo::net::TcpConnectionPtr const& conn,
                    EchoMsgPtr const& msg,
                    muduo::Timestamp time);
 
