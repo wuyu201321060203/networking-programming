@@ -16,7 +16,6 @@
 
 typedef boost::function<void ()> TimeoutCallback;
 typedef unsigned int UINT;
-typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
 
 using namespace muduo;
 using namespace muduo::net;
@@ -45,8 +44,7 @@ public:
                   cancelled_(false),
                   conn_(conn)
         {
-            timerId_ = loop->runAfter( initial_ , boost::bind(
-                    &HeartBeatManager::HBWorker::onExpiredCallback , this) );
+            timerId_ = getCronJob(initial_);
         }
 
         ~HBWorker()//取消定时器
@@ -60,15 +58,13 @@ public:
             if(T_++ > heartBeats_)
                 LOG_INFO << conn_->peerAddress().toIpPort() << " may be down";
             callback_();
-            timerId_ = loop_->runAfter( interval_ , boost::bind(
-                &HeartBeatManager::HBWorker::onExpiredCallback , this) );
+            timerId_ = getCronJob(interval_);
         }
 
         void resetExpiredTime()
         {
             cancelTimer();
-            timerId_ = loop_->runAfter( initial_ , boost::bind(
-                &HeartBeatManager::HBWorker::onExpiredCallback , this ) );
+            timerId_ = getCronJob(initial_);
         }
 
         void resetHeartBeats()
@@ -92,6 +88,15 @@ public:
         bool cancelled_;
         TcpConnectionPtr conn_;
         TimerId timerId_;
+
+    private:
+
+        TimerId getCronJob(UINT when)
+        {
+            return ( loop_->runAfter(when ,
+                boost::bind(&HeartBeatManager::HBWorker::onExpiredCallback , this)
+                                    ) );
+        }
     };
 
     typedef boost::shared_ptr<HBWorker> HBWorkerPtr;
