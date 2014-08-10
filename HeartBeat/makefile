@@ -11,12 +11,15 @@ CXXFLAGS = -g -O0 -Wall -Wextra -Werror \
 LDFLAGS = -L$(MUDUO_LIBRARY) -lmuduo_net_cpp11 -lmuduo_base_cpp11 -lpthread -lrt -lprotobuf \
 		  				     -lboost_program_options
 
-all: echoServer
+BIN_PROGRAM = echoServer
+
+all: $(BIN_PROGRAM)
 
 clean:
+	test -z "$(BIN_PROGRAM)" || rm -f $(BIN_PROGRAM)
 	rm -f *.o core
 
-echoServer: codec.o EchoMessage.pb.o echo.o main.o
+$(BIN_PROGRAM): codec.o EchoMessage.pb.o echo.o main.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 codec.o: $(SRC)/codec.cc
