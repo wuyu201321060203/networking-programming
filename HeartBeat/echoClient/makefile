@@ -16,7 +16,7 @@ all: echoClient
 clean:
 	rm -f *.o core
 
-echoClient: codec.o EchoMessage.pb.o echoClient.o
+echoClient: codec.o EchoMessage.pb.o echoClient.o util.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 codec.o: $(SRC)/codec.cc
@@ -26,6 +26,9 @@ EchoMessage.pb..o: $(SRC)/EchoMessage.pb.cc
 	g++ $(CXXFLAGS) -c $^
 
 echoClient.o: $(SRC)/echoClient.cc
+	g++ $(CXXFLAGS) -c $^
+
+util.o: $(SRC)/util.cc
 	g++ $(CXXFLAGS) -c $^
 
 .PHONY: all clean

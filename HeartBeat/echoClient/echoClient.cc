@@ -46,7 +46,7 @@ public:
             boost::bind(&EchoClient::onMessage , this , _1 , _2 , _3));
         dispatcher_.registerCallback<HeartBeatMessage>(
             boost::bind(&HeartBeatManager::onMessageCallback,
-            &SingleHB::instance() , _1 , _2 , _3));
+            &manager_ , _1 , _2 , _3));
 
         client_.setConnectionCallback(
             boost::bind(&EchoClient::onConnection, this, _1));
@@ -54,7 +54,7 @@ public:
         client_.setMessageCallback(
             boost::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
 
-        SingleHB::instance().setEventLoop(loop_);
+        manager_.setEventLoop(loop_);
     }
 
     void connect()
@@ -72,7 +72,7 @@ private:
 
         if (conn->connected())
         {
-            SingleHB::instance().delegateHeartBeatTask(50 , 10 , 3,
+            manager_.delegateTimerTask(50 , 10 , 3,
                 boost::bind(&EchoClient::onHeartBeatMessage , this , conn),
                 conn);
 
@@ -90,7 +90,7 @@ private:
 
     void onMessage(TcpConnectionPtr const& conn, EchoMsgPtr const& msg, Timestamp time)
     {
-        SingleHB::instance().resetHeartBeatTask(conn);
+        manager_.resetTimerTask(conn);
         LOG_TRACE << conn->name() << " recv " << msg->ByteSize() << " bytes at " << time.toString();
         EchoMessage message;
         message.set_msg(msg->msg());
@@ -115,6 +115,7 @@ private:
     TcpClient client_;
     ProtobufDispatcher dispatcher_;
     ProtobufCodec codec_;
+    HeartBeatManager manager_;
 };
 
 

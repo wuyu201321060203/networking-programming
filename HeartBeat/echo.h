@@ -8,6 +8,7 @@
 #include "codec.h"
 #include "ProtobufDispatcher.h"
 #include "EchoMessage.pb.h"
+#include "HeartBeatManager.h"
 
 typedef boost::shared_ptr<EchoMessage> EchoMsgPtr;
 typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
@@ -27,8 +28,8 @@ private:
     void onConnection(muduo::net::TcpConnectionPtr const& conn);
 
     void onEchoMessage(muduo::net::TcpConnectionPtr const& conn,
-                   EchoMsgPtr const& msg,
-                   muduo::Timestamp time);
+                       EchoMsgPtr const& msg,
+                       muduo::Timestamp time);
 
     void onHeartBeatMessage();
 
@@ -40,6 +41,7 @@ private:
     muduo::net::TcpServer server_;
     ProtobufDispatcher dispatcher_;
     ProtobufCodec codec_;
+    HeartBeatManager manager_;
 };
 
 #endif

@@ -19,7 +19,7 @@ clean:
 	test -z "$(BIN_PROGRAM)" || rm -f $(BIN_PROGRAM)
 	rm -f *.o core
 
-$(BIN_PROGRAM): codec.o EchoMessage.pb.o echo.o main.o
+$(BIN_PROGRAM): codec.o EchoMessage.pb.o echo.o main.o util.o
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 codec.o: $(SRC)/codec.cc
@@ -32,6 +32,9 @@ echo.o: $(SRC)/echo.cc
 	g++ $(CXXFLAGS) -c $^
 
 main.o: $(SRC)/main.cc
+	g++ $(CXXFLAGS) -c $^
+
+util.o: $(SRC)/util.cc
 	g++ $(CXXFLAGS) -c $^
 
 .PHONY: all clean

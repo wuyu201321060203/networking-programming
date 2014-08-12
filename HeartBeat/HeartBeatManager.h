@@ -6,144 +6,152 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 #include <muduo/base/Timestamp.h>
 #include <muduo/net/TimerId.h>
 #include <muduo/net/EventLoop.h>
-#include <muduo/base/Singleton.h>
+#include <muduo/base/Logging.h>
 
+#include "Config.h"
+#include "util.h"
 #include "EchoMessage.pb.h"
 
 typedef boost::function<void ()> TimeoutCallback;
-typedef unsigned int UINT;
-
-using namespace muduo;
-using namespace muduo::net;
+typedef unsigned int uint;
+typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
 
 class HeartBeatManager : boost::noncopyable
 {
 public:
 
-    //start HBWorker
-    class HBWorker
+    class HeartBeater
     {
     public:
 
-        HBWorker( EventLoop* loop,
-                  UINT initial,
-                  UINT interval,
-                  UINT heartBeats,
-                  TimeoutCallback const& cb,
-                  TcpConnectionPtr const& conn
-                ):loop_(loop),
-                  initial_(initial),
-                  interval_(interval),
-                  heartBeats_(heartBeats),
-                  T_(0),
-                  callback_(cb),
-                  cancelled_(false),
-                  conn_(conn)
+        HeartBeater(muduo::net::EventLoop* loop,
+                    uint startTime,
+                    uint timeInterval,
+                    uint ttl,
+                    TimeoutCallback const& cb,
+                    muduo::net::TcpConnectionPtr const& conn,
+                    HeartBeatManager* manager
+                    ):
+                        _loop(loop),
+                        _startTime(startTime),
+                        _timeInterval(timeInterval),
+                        _ttl(ttl),
+                        _counter(0),
+                        _callback(cb),
+                        _conn(conn),
+                        _manager(manager)
         {
-            timerId_ = getCronJob(initial_);
+            _taskID = getTimerTask(_startTime);
         }
 
-        ~HBWorker()//取消定时器
+        ~HeartBeater()
         {
-            if(!cancelled_)
-                cancelTimer();
+            cancelTimerTask();
         }
 
-        void onExpiredCallback()
+        void onTimeout()
         {
-            if(T_++ > heartBeats_)
-                LOG_INFO << conn_->peerAddress().toIpPort() << " may be down";
-            callback_();
-            timerId_ = getCronJob(interval_);
+            if(_counter++ > _ttl)
+            {
+                LOG_INFO << _conn->peerAddress().toIpPort() << " may be down";//TODO
+                _callback();
+                _manager->deleteTimerTask(_conn);
+            }
+            else
+                _taskID = getTimerTask(_timeInterval);
         }
 
-        void resetExpiredTime()
+        void resetTimeout()
         {
-            cancelTimer();
-            timerId_ = getCronJob(initial_);
+            _counter = 0;
+            cancelTimerTask();
+            _taskID = getTimerTask(_startTime);
         }
 
-        void resetHeartBeats()
+        void cancelTimerTask()
         {
-            T_ = 0;
+            _loop->cancel(_taskID);
         }
 
-        void cancelTimer()
+        TcpConnectionWeakPtr getConnWeakPtr()
         {
-            loop_->cancel(timerId_);
+            return _conn;
         }
 
     private:
 
-        EventLoop* loop_;
-        UINT initial_;
-        UINT interval_;
-        UINT heartBeats_;
-        UINT T_;
-        TimeoutCallback callback_;
-        bool cancelled_;
-        TcpConnectionPtr conn_;
-        TimerId timerId_;
+        muduo::net::EventLoop* _loop;
+        uint _startTime;
+        uint _timeInterval;
+        uint _ttl;
+        uint _counter;
+        TimeoutCallback _callback;
+        muduo::net::TcpConnectionPtr _conn;
+        muduo::net::TimerId _taskID;
+        HeartBeatManager* _manager;
 
     private:
 
-        TimerId getCronJob(UINT when)
+        muduo::net::TimerId getTimerTask(uint when)
         {
-            return ( loop_->runAfter(when ,
-                boost::bind(&HeartBeatManager::HBWorker::onExpiredCallback , this)
-                                    ) );
+            return ( _loop->runAfter(when,
+                boost::bind(&HeartBeatManager::HeartBeater::onTimeout,
+                this) )
+                );
         }
     };
 
-    typedef boost::shared_ptr<HBWorker> HBWorkerPtr;
-    //end HBWorker
+    typedef boost::shared_ptr<HeartBeater> HeartBeaterPtr;
+    typedef std::map<STDSTR , HeartBeaterPtr> Name2BeaterMap;
 
-    void setEventLoop(EventLoop* loop)
+    void setEventLoop(muduo::net::EventLoop* loop)
     {
-        loop_ = loop;
+        _loop = loop;
     }
 
-    void delegateHeartBeatTask(UINT initial,  //seconds
-                               UINT interval, //seconds
-                               UINT heartBeats,
-                               TimeoutCallback const& cb,
-                               TcpConnectionPtr const& conn)
+    void delegateTimerTask(uint startTime,  //seconds
+                           uint timeInterval, //seconds
+                           uint ttl,
+                           TimeoutCallback const& cb,
+                           muduo::net::TcpConnectionPtr const& conn)
     {
-        HBWorkerPtr worker( new HBWorker( loop_ , initial , interval , heartBeats,
-                                          cb , conn) );
-        string connName = conn->name();
-        auto it = workerMap_.find(connName);
-        if(it != workerMap_.end())
-            LOG_FATAL << "The connection heartbeat has been built";
-        workerMap_[connName] = worker;
+        HeartBeaterPtr beater( new HeartBeater( _loop , startTime , timeInterval,
+            ttl , cb , conn , this) );
+        STDSTR const connName = MuduoStr2StdStr(conn->name());
+        _beaterMap.insert(Name2BeaterMap::value_type(connName , beater));
     }
 
-    void resetHeartBeatTask(TcpConnectionPtr const& conn)
+    void resetTimerTask(muduo::net::TcpConnectionPtr const& conn)
     {
-        string connName = conn->name();
-        HBWorkerPtr worker = workerMap_[connName];
-        worker->resetExpiredTime();
-        worker->resetHeartBeats();
+        STDSTR connName = MuduoStr2StdStr(conn->name());
+        auto it = _beaterMap.find(connName);
+        if(it != _beaterMap.end())
+            ( it->second )->resetTimeout();
     }
 
-    void revokeHeartBeatTask(TcpConnectionPtr const& conn)
+    void deleteTimerTask(muduo::net::TcpConnectionPtr const& conn)
     {
-        string connName = conn->name();
-        auto it = workerMap_.find(connName);
-        if( it != workerMap_.end() )
-            (it->second)->cancelTimer();
-        workerMap_.erase(it);
+        for(auto it = _beaterMap.begin() ; it != _beaterMap.end();)
+        {
+            if(it->first == MuduoStr2StdStr(conn->name()))
+            {
+                _beaterMap.erase(it++);
+            }
+            else
+                ++it;
+        }
     }
 
     void onMessageCallback(muduo::net::TcpConnectionPtr const& conn,
                            HBMsgPtr const& msg,
                            muduo::Timestamp timestamp)
     {
-        resetHeartBeatTask(conn);
+        resetTimerTask(conn);
         muduo::net::Buffer buf;
         EchoMessage message;
         message.set_msg(msg->msg());
@@ -151,24 +159,18 @@ public:
         conn->send(&buf);
     }
 
-private:
-
-    HeartBeatManager()
+    void getDCList(TcpConnectionWeakPtrVec& dcList)
     {
+        for(auto it = _beaterMap.begin() ; it != _beaterMap.end() ; ++it)
+        {
+            dcList.push_back( (it->second)->getConnWeakPtr() );
+        }
     }
-
-    ~HeartBeatManager()
-    {
-    }
-
-    friend class muduo::Singleton<HeartBeatManager>;
 
 private:
 
-    EventLoop* loop_;
-    std::map<string , HBWorkerPtr> workerMap_;
+    muduo::net::EventLoop* _loop;
+    Name2BeaterMap _beaterMap;
 };
-
-typedef muduo::Singleton<HeartBeatManager> SingleHB;
 
 #endif
