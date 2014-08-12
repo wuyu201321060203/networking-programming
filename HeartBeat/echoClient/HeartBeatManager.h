@@ -20,6 +20,8 @@ typedef unsigned int UINT;
 using namespace muduo;
 using namespace muduo::net;
 
+typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
+
 class HeartBeatManager : boost::noncopyable
 {
 public:
@@ -56,7 +58,9 @@ public:
         void onExpiredCallback()
         {
             if(T_++ > heartBeats_)
-                LOG_INFO << conn_->peerAddress().toIpPort() << " may be down";
+            {
+                LOG_FATAL << conn_->peerAddress().toIpPort() << " may be down";
+            }
             callback_();
             timerId_ = getCronJob(interval_);
         }
