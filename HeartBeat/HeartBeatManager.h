@@ -2,6 +2,7 @@
 #define HEART_BEAT_MANAGER_H
 
 #include <map>
+#include <string>
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
@@ -13,13 +14,14 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/base/Logging.h>
 
-#include "Config.h"
 #include "util.h"
-#include "EchoMessage.pb.h"
 
 typedef boost::function<void ()> TimeoutCallback;
+typedef boost::function<void (muduo::net::TcpConnectionPtr const&,
+                              MessagePtr const&,
+                              muduo::Timestamp)> onTimeCallback;
 typedef unsigned int uint;
-typedef boost::shared_ptr<HeartBeatMessage> HBMsgPtr;
+typedef std::string STDSTR;
 
 class HeartBeatManager : boost::noncopyable
 {
@@ -78,11 +80,6 @@ public:
             _loop->cancel(_taskID);
         }
 
-        TcpConnectionWeakPtr getConnWeakPtr()
-        {
-            return _conn;
-        }
-
     private:
 
         muduo::net::EventLoop* _loop;
@@ -108,6 +105,13 @@ public:
 
     typedef boost::shared_ptr<HeartBeater> HeartBeaterPtr;
     typedef std::map<STDSTR , HeartBeaterPtr> Name2BeaterMap;
+
+    HeartBeatManager(muduo::net::EventLoop* loop,
+                     onTimeCallback const& cb):
+                     _loop(loop),
+                     _onTimeCallback(cb)
+    {
+    }
 
     void setEventLoop(muduo::net::EventLoop* loop)
     {
@@ -148,29 +152,18 @@ public:
     }
 
     void onMessageCallback(muduo::net::TcpConnectionPtr const& conn,
-                           HBMsgPtr const& msg,
-                           muduo::Timestamp timestamp)
+                           MessagePtr const& msg,
+                           muduo::Timestamp time)
     {
         resetTimerTask(conn);
-        muduo::net::Buffer buf;
-        EchoMessage message;
-        message.set_msg(msg->msg());
-        ProtobufCodec::fillEmptyBuffer(&buf , message);
-        conn->send(&buf);
-    }
-
-    void getDCList(TcpConnectionWeakPtrVec& dcList)
-    {
-        for(auto it = _beaterMap.begin() ; it != _beaterMap.end() ; ++it)
-        {
-            dcList.push_back( (it->second)->getConnWeakPtr() );
-        }
+        _onTimeCallback(conn , msg , time);
     }
 
 private:
 
     muduo::net::EventLoop* _loop;
     Name2BeaterMap _beaterMap;
+    onTimeCallback _onTimeCallback;
 };
 
 #endif

@@ -11,7 +11,9 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
                          dispatcher_(boost::bind(&EchoServer::onUnknownMessage,
                                                 this , _1 , _2 , _3)),
                          codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
-                                            &dispatcher_, _1 , _2 , _3))
+                                            &dispatcher_, _1 , _2 , _3)),
+                         manager_(loop , boost::bind(&EchoServer::onHeartBeatMsg,
+                                    this , _1 , _2 , _3))
 {
     dispatcher_.registerCallback<EchoMessage>(
             boost::bind(&EchoServer::onEchoMessage , this , _1 , _2 , _3));
@@ -25,8 +27,6 @@ EchoServer::EchoServer(muduo::net::EventLoop* loop,
 
     server_.setMessageCallback(
         boost::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
-
-    manager_.setEventLoop(loop_);
 }
 
 void EchoServer::start()
@@ -43,7 +43,7 @@ void EchoServer::onConnection(muduo::net::TcpConnectionPtr const& conn)
     if(conn->connected())
     {
         manager_.delegateTimerTask(60 , 10 , 3,
-            boost::bind(&EchoServer::onHeartBeatMessage , this),
+            boost::bind(&EchoServer::onTimeout , this),
             conn);
     }
 }
@@ -60,10 +60,9 @@ void EchoServer::onEchoMessage(muduo::net::TcpConnectionPtr const& conn,
     codec_.send(conn , message);
 }
 
-void EchoServer::onHeartBeatMessage()
+void EchoServer::onTimeout()
 {
     LOG_INFO << "peer is down down down :-)";
-    return;
 }
 
 void EchoServer::onUnknownMessage(muduo::net::TcpConnectionPtr const& conn,
@@ -71,4 +70,12 @@ void EchoServer::onUnknownMessage(muduo::net::TcpConnectionPtr const& conn,
                                   muduo::Timestamp receiveTime)
 {
     LOG_INFO << "onUnknownMessage:" << msg->GetTypeName();
+}
+
+void EchoServer::onHeartBeatMsg(muduo::net::TcpConnectionPtr const& conn,
+                                MessagePtr const& msg,
+                                muduo::Timestamp receiveTime)
+{
+    HeartBeatMessage message;
+    codec_.send(conn , message);
 }

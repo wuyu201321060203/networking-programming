@@ -31,11 +31,15 @@ private:
                        EchoMsgPtr const& msg,
                        muduo::Timestamp time);
 
-    void onHeartBeatMessage();
+    void onTimeout();
 
     void onUnknownMessage(muduo::net::TcpConnectionPtr const& conn,
                           MessagePtr const& meg,
                           muduo::Timestamp receiveTime);
+
+    void onHeartBeatMsg(muduo::net::TcpConnectionPtr const&,
+                        MessagePtr const&,
+                        muduo::Timestamp time);
 
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer server_;

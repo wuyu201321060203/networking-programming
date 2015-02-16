@@ -39,7 +39,10 @@ public:
           dispatcher_(boost::bind(&EchoClient::onUnknownMessage,
                                   this , _1 , _2 , _3)),
           codec_(boost::bind(&ProtobufDispatcher::onProtobufMessage,
-                             &dispatcher_, _1 , _2 , _3))
+                             &dispatcher_, _1 , _2 , _3)),
+
+          manager_(loop , boost::bind(&EchoClient::onHeartBeatMessage , this ,
+                  _1 , _2 , _3))
 
     {
         dispatcher_.registerCallback<EchoMessage>(
@@ -53,8 +56,6 @@ public:
 
         client_.setMessageCallback(
             boost::bind(&ProtobufCodec::onMessage, &codec_, _1, _2, _3));
-
-        manager_.setEventLoop(loop_);
     }
 
     void connect()
@@ -73,7 +74,7 @@ private:
         if (conn->connected())
         {
             manager_.delegateTimerTask(50 , 10 , 3,
-                boost::bind(&EchoClient::onHeartBeatMessage , this , conn),
+                boost::bind(&EchoClient::onTimeout , this),
                 conn);
 
             ++current;
@@ -97,7 +98,8 @@ private:
         codec_.send(conn , message);
     }
 
-    void onHeartBeatMessage(TcpConnectionPtr const& conn)
+    void onHeartBeatMessage(TcpConnectionPtr const& conn , MessagePtr const& msg,
+                            muduo::Timestamp)
     {
         HeartBeatMessage message;
         message.set_msg("bingo");
@@ -109,6 +111,11 @@ private:
                           Timestamp receiveTime)
     {
          LOG_INFO << "onUnknownMessage:" << msg->GetTypeName();
+    }
+
+    void onTimeout()
+    {
+        LOG_INFO << "server may be down..............";
     }
 
     EventLoop* loop_;
